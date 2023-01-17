@@ -1,0 +1,119 @@
+{
+    "Rules": "max 3 top, 2 top overlay, 3 sides, 2 side overlay, 1 bottom, same for normal maps",
+    "Blocks": {
+        "DIRT": {
+            "top_textures": [
+                "dirt/dirt_top.png",
+                "dirt/dirt_top_01.png",
+                "dirt/dirt_top_02.png"
+            ],
+            "side_textures": [
+                "dirt/dirt.png",
+                "dirt/dirt_01.png",
+                "dirt/dirt_02.png"
+            ],
+            "bottom_texture": [
+                "dirt/dirt_top.png"
+            ],
+            "top_over_textures": [],
+            "side_over_textures": [],
+            "top_normals": [
+                "dirt/normal/dirt_top.png",
+                "dirt/normal/dirt_top_01.png",
+                "dirt/normal/dirt_top_02.png"
+            ],
+            "side_normals": [
+                "dirt/normal/dirt.png",
+                "dirt/normal/dirt_01.png",
+                "dirt/normal/dirt_02.png"
+            ],
+            "bottom_normal": [
+                "dirt/normal/dirt_top.png"
+            ],
+            "top_over_normals": [],
+            "side_over_normals": []
+        },
+        "GRASS": {
+            "top_textures": [
+                "grass/grass_block_top.png"
+            ],
+            "side_textures": [
+                "grass/grass_block_side.png",
+                "grass/grass_block_side_01.png",
+                "grass/grass_block_side_02.png"
+            ],
+            "bottom_texture": [
+                "dirt/dirt.png"
+            ],
+            "top_over_textures": [
+                "grass/grass_block_top_overlay_01.png",
+                "grass/grass_block_top_overlay_02.png"
+            ],
+            "side_over_textures": [],
+            "top_normals": [
+                "grass/normal/grass_block_top.png"
+            ],
+            "side_normals": [
+                "grass/normal/grass_block_side.png",
+                "grass/normal/grass_block_side_01.png",
+                "grass/normal/grass_block_side_02.png"
+            ],
+            "bottom_normal": [
+                "dirt/normal/dirt_top_01.png"
+            ],
+            "top_over_normals": [
+                "grass/normal/grass_block_top_overlay_01.png",
+                "grass/normal/grass_block_top_overlay_02.png"
+            ],
+            "side_over_normals": []
+        },
+        "STONE": {
+            "top_textures": [
+                "stone/stone.png",
+                "stone/stone_01.png",
+                "stone/stone_02.png"
+            ],
+            "side_textures": [
+                "stone/stone.png",
+                "stone/stone_01.png",
+                "stone/stone_02.png"
+            ],
+            "bottom_texture": [
+                "stone/stone.png"
+            ],
+            "top_over_textures": [],
+            "side_over_textures": [],
+            "top_normals": [
+                "stone/normal/stone.png",
+                "stone/normal/stone_01.png",
+                "stone/normal/stone_02.png"
+            ],
+            "side_normals": [
+                "stone/normal/stone.png",
+                "stone/normal/stone_01.png",
+                "stone/normal/stone_02.png"
+            ],
+            "bottom_normal": [
+                "stone/normal/stone.png"
+            ],
+            "top_over_normals": [],
+            "side_over_normals": []
+        },
+        "SAND": {
+            "top_textures": [],
+            "side_textures": [],
+            "bottom_texture": [],
+            "top_over_textures": [],
+            "side_over_textures": [],
+            "top_normals": [],
+            "side_normals": [],
+            "bottom_normal": [],
+            "top_over_normals": [],
+            "side_over_normals": []
+        }
+    },
+    "Sky": {
+        "SUN": "sky/sun.png",
+        "MOON": "sky/moon.png"
+    }
+}

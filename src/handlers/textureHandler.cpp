@@ -1,0 +1,24 @@
+#include "common.hpp"
+#include "texture.hpp"
+#include "handlers/textureHandler.hpp"
+
+TextureHandler::TextureHandler() {
+	textures_.push_back(new ImageTexture({ "test.jpg" }, TEXTURE_2D, { {TEXTURE_MAX_LEVEL, BASE_LEVEL_4} ,  {TEXTURE_WRAP_S, CLAMP_TO_BORDER}, {TEXTURE_WRAP_T, CLAMP_TO_BORDER}, {TEXTURE_MIN_FILTER, LINEAR_MIPMAP_LINEAR}, {TEXTURE_MAG_FILTER, LINEAR} }, BGR));
+	textures_.push_back(new ImageTexture({ "test2.jpg" }, TEXTURE_2D, { {TEXTURE_MAX_LEVEL, BASE_LEVEL_4} ,  {TEXTURE_WRAP_S, CLAMP_TO_BORDER}, {TEXTURE_WRAP_T, CLAMP_TO_BORDER}, {TEXTURE_MIN_FILTER, LINEAR_MIPMAP_LINEAR}, {TEXTURE_MAG_FILTER, LINEAR} }, BGR));
+	textures_.push_back(new ImageTexture({ "graph.png" }, TEXTURE_2D, { {TEXTURE_MAX_LEVEL, BASE_LEVEL_4} ,  {TEXTURE_WRAP_S, CLAMP_TO_BORDER}, {TEXTURE_WRAP_T, CLAMP_TO_BORDER}, {TEXTURE_MIN_FILTER, LINEAR_MIPMAP_LINEAR}, {TEXTURE_MAG_FILTER, LINEAR} }, BGRA));
+	textures_.push_back(new ImageTexture({ "1.png" }, TEXTURE_2D, { {TEXTURE_MAX_LEVEL, BASE_LEVEL_4} ,  {TEXTURE_WRAP_S, CLAMP_TO_BORDER}, {TEXTURE_WRAP_T, CLAMP_TO_BORDER}, {TEXTURE_MIN_FILTER, LINEAR_MIPMAP_LINEAR}, {TEXTURE_MAG_FILTER, LINEAR} }, BGRA));
+	textures_.push_back(new ImageTexture({ "2.png" }, TEXTURE_2D, { {TEXTURE_MAX_LEVEL, BASE_LEVEL_4} ,  {TEXTURE_WRAP_S, CLAMP_TO_BORDER}, {TEXTURE_WRAP_T, CLAMP_TO_BORDER}, {TEXTURE_MIN_FILTER, LINEAR_MIPMAP_LINEAR}, {TEXTURE_MAG_FILTER, LINEAR} }, BGRA));
+	textures_.push_back(new ImageTexture({ "3.png" }, TEXTURE_2D, { {TEXTURE_MAX_LEVEL, BASE_LEVEL_4} ,  {TEXTURE_WRAP_S, CLAMP_TO_BORDER}, {TEXTURE_WRAP_T, CLAMP_TO_BORDER}, {TEXTURE_MIN_FILTER, LINEAR_MIPMAP_LINEAR}, {TEXTURE_MAG_FILTER, LINEAR} }, BGRA));
+	textures_.push_back(new ImageTexture({ "sky\\sun.png" }, TEXTURE_2D, { {TEXTURE_MAX_LEVEL, BASE_LEVEL_4} ,  {TEXTURE_WRAP_S, CLAMP_TO_BORDER}, {TEXTURE_WRAP_T, CLAMP_TO_BORDER}, {TEXTURE_MIN_FILTER, LINEAR_MIPMAP_LINEAR}, {TEXTURE_MAG_FILTER, LINEAR} }, BGRA));
+	textures_.push_back(new ImageTexture({ "sky\\moon.png" }, TEXTURE_2D, { {TEXTURE_MAX_LEVEL, BASE_LEVEL_4} ,  {TEXTURE_WRAP_S, CLAMP_TO_BORDER}, {TEXTURE_WRAP_T, CLAMP_TO_BORDER}, {TEXTURE_MIN_FILTER, LINEAR_MIPMAP_LINEAR}, {TEXTURE_MAG_FILTER, LINEAR} }, BGRA));
+	textures_.push_back(new ArkNoiseProceduralTexture(TEXTURE_2D, { {TEXTURE_MAX_LEVEL, BASE_LEVEL_4} ,  {TEXTURE_WRAP_S, CLAMP_TO_BORDER}, {TEXTURE_WRAP_T, CLAMP_TO_BORDER}, {TEXTURE_MIN_FILTER, NEAREST_MIPMAP_NEAREST}, {TEXTURE_MAG_FILTER, NEAREST} }, RGB, 1000, 1000, 1.0f, glm::vec<4, unsigned int>(55U, 111U, 44U, 99U), glm::vec<4, unsigned int>(456U, 387U, 0U, 0U), 765767U));		//mid
+	textures_.push_back(new ArkNoiseProceduralTexture(TEXTURE_2D, { {TEXTURE_MAX_LEVEL, BASE_LEVEL_4} ,  {TEXTURE_WRAP_S, CLAMP_TO_BORDER}, {TEXTURE_WRAP_T, CLAMP_TO_BORDER}, {TEXTURE_MIN_FILTER, NEAREST_MIPMAP_NEAREST}, {TEXTURE_MAG_FILTER, NEAREST} }, RGB, 1000, 1000, 1.0f, glm::vec<4, unsigned int>(21U, 12U, 55U, 111U), glm::vec<4, unsigned int>(11111U, 456U, 0U, 0U), 765767U));		//up
+	textures_.push_back(new ArkNoiseProceduralTexture(TEXTURE_2D, { {TEXTURE_MAX_LEVEL, BASE_LEVEL_4} ,  {TEXTURE_WRAP_S, CLAMP_TO_BORDER}, {TEXTURE_WRAP_T, CLAMP_TO_BORDER}, {TEXTURE_MIN_FILTER, NEAREST_MIPMAP_NEAREST}, {TEXTURE_MAG_FILTER, NEAREST} }, RGB, 1000, 1000, 1.0f, glm::vec<4, unsigned int>(44U, 99U, 21U, 12U), glm::vec<4, unsigned int>(387U, 11111U, 0U, 0U), 765767U));	//bottom
+}
+
+TextureHandler::~TextureHandler() {
+	for (std::vector<Texture*>::iterator it = textures_.begin(); it != textures_.end(); ++it) {
+		delete (*it);
+	}
+}
+
