@@ -1,6 +1,5 @@
 #pragma once
 
-template <unsigned int Dim>
 class DataComponent {
 	public:
 	enum CHANNEL {
@@ -12,20 +11,12 @@ class DataComponent {
 	};
 
 	DataComponent()
-		: datas_(std::vector<Vertex<Dim>>())
+		: datas_(std::vector<Vertex3D>())
 		, ID_(-1)
 		, indexed_(false) {}
 	virtual ~DataComponent() {}
 
-	const bool HasData(const CHANNEL c) const {
-		if (datas_.find(c) == datas_.end())	return false;
-		return true;
-	}
-	void SetData(const CHANNEL c, std::vector<GLfloat>& data, GLuint nb_pack) {
-		datas_.insert(std::pair<CHANNEL, std::pair<GLuint, std::vector<GLfloat>>>(c, { nb_pack, data }));
-	}
-
-	const std::vector<Vertex<Dim>>& GetData() const {
+	const std::vector<Vertex3D>& GetData() const {
 		return datas_;
 	}
 
@@ -40,37 +31,37 @@ class DataComponent {
 	const int& GetID() const { return ID_; };
 
 	protected:
-	std::vector<Vertex<Dim>> datas_;
+	std::vector<Vertex3D> datas_;
 	std::vector<unsigned int> indexes_;
 	int ID_;
 	bool indexed_;
 };
 
-class SquareDataComponent: public DataComponent<3> {
+class SquareDataComponent: public DataComponent {
 	public:
 	SquareDataComponent() = delete;
 	SquareDataComponent(const int& subdivisions = 0);
 };
 
-class CubeDataComponent: public DataComponent<3> {
+class CubeDataComponent: public DataComponent {
 	public:
 	CubeDataComponent() = delete;
 	CubeDataComponent(const int& subdivisions = 0, const bool& sphere = false);
 };
 
-class CircleDataComponent: public DataComponent<3> {
+class CircleDataComponent: public DataComponent {
 	public:
 	CircleDataComponent() = delete;
 	CircleDataComponent(const unsigned int divisions, const int& subdivisions = 0);
 };
 
-class SphereDataComponent: public DataComponent<3> {
+class SphereDataComponent: public DataComponent {
 	public:
 	SphereDataComponent() = delete;
 	SphereDataComponent(const unsigned int divisions_width, const unsigned int divisions_height, const int& subdivisions = 0, const bool displacement = false);
 };
 
-class Pointer2DDataComponent: public DataComponent<2> {
+class Pointer2DDataComponent: public DataComponent {
 	public:
 	Pointer2DDataComponent();
 };

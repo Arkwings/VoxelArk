@@ -5,14 +5,14 @@
 #include "texture.hpp"
 #include "terrain/block.hpp"
 
-Block::Block(const std::vector<std::string>& tex_names, DataComponent<3>* data, HitboxComponent* hit, const std::unordered_map<TEXTURE_PARAM_NAME, TEXTURE_PARAM_VALUE>& tex_params)
+Block::Block(const std::vector<std::string>& tex_names, DataComponent* data, HitboxComponent* hit, const std::unordered_map<TEXTURE_PARAM_NAME, TEXTURE_PARAM_VALUE>& tex_params)
     : data_(data)
     , hit_(hit) {   //to modify to cube
-    top_tex_ = new BlockTexture(string_to_vec_string(tex_names[0], ',', "[]\""), tex_params, BGR);
-    side_tex_ = new BlockTexture(string_to_vec_string(tex_names[1], ',', "[]\""), tex_params, BGR);
-    bottom_tex_ = new BlockTexture(string_to_vec_string(tex_names[2], ',', "[]\""), tex_params, BGR);
-    top_over_tex_ = new BlockTexture(string_to_vec_string(tex_names[3], ',', "[]\""), tex_params, BGRA);
-    side_over_tex_ = new BlockTexture(string_to_vec_string(tex_names[4], ',', "[]\""), tex_params, BGRA);
+    top_tex_ = new ImageTexture(string_to_vec_string(tex_names[0], ',', "[]\""), TEXTURE_2D_ARRAY, tex_params, BGR);
+    side_tex_ = new ImageTexture(string_to_vec_string(tex_names[1], ',', "[]\""), TEXTURE_2D_ARRAY, tex_params, BGR);
+    bottom_tex_ = new ImageTexture(string_to_vec_string(tex_names[2], ',', "[]\""), TEXTURE_2D_ARRAY, tex_params, BGR);
+    top_over_tex_ = new ImageTexture(string_to_vec_string(tex_names[3], ',', "[]\""), TEXTURE_2D_ARRAY, tex_params, BGRA);
+    side_over_tex_ = new ImageTexture(string_to_vec_string(tex_names[4], ',', "[]\""), TEXTURE_2D_ARRAY, tex_params, BGRA);
 }
 
 Block::~Block() {

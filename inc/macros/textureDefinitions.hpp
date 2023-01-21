@@ -12,4 +12,7 @@ namespace TEX {
     constexpr unsigned int PERLINTESTMID = 8U;
     constexpr unsigned int PERLINTESTUP = 9U;
     constexpr unsigned int PERLINTESTBOTTOM = 10U;
+
+    inline int MAX_TEX_SIZE = 0U;
+    inline int MAX_TEX_MAX_ANISOTROPY = 0U;
 };

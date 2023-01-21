@@ -1,5 +1,4 @@
 #include "common.hpp"
-#include "utils/convert.hpp"
 
 void vec_string_to_vec_char_array(const std::vector<std::string>& tab, std::vector<const char*>& new_tab) {
     for (std::vector<std::string>::const_iterator it(tab.begin()); it != tab.end(); ++it) {

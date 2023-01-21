@@ -1,7 +1,6 @@
 #pragma once
 
-template <unsigned int Dim> class DataComponent;
-//template <unsigned int Dim> class DataComponent {};
+class DataComponent;
 class HitboxComponent;
 class TransformationComponent;
 
@@ -16,7 +15,7 @@ class Object {
     void DrawDynamic(const unsigned int& drawPrimitives, const unsigned int& shaderID, const glm::mat4& model);
     void CheckOnCamera(unsigned int& transIndex);
 
-    void SetData(DataComponent<Dim>* dataComp);
+    void SetData(DataComponent* dataComp);
     void SetStaticModels();
     void SetHitbox(HitboxComponent* hitComp) { if (hitObj_ != nullptr) delete hitObj_; hitObj_ = hitComp; }
     void SetSelectable(const bool& selectable) { selectable_ = selectable; }
@@ -26,7 +25,7 @@ class Object {
     void RemoveStaticTransfo(const unsigned int& transIndex) { delete transObj_[transIndex];  transObj_.erase(transObj_.begin() + transIndex); }
     void RemoveDynamicTransfo(const unsigned int& transIndex) { delete transObjDynamic_[transIndex];  transObjDynamic_.erase(transObjDynamic_.begin() + transIndex); }
 
-    DataComponent<Dim>* GetData() const { return dataObj_; }
+    DataComponent* GetData() const { return dataObj_; }
     HitboxComponent* GetHitbox() const { return hitObj_; }
     TransformationComponent* GetTransfoStatic(const unsigned int& transfoID) const { return transObj_[transfoID]; }
     TransformationComponent* GetTransfoDynamic(const unsigned int& transfoID) const { return transObjDynamic_[transfoID]; }
@@ -37,12 +36,12 @@ class Object {
     const bool& IsIndexed() const { return indexed_; }
     private:
 
-    void addDatas(const std::vector<Vertex<Dim>>& vertices, const std::vector<unsigned int>& indexes);
+    void addDatas(const std::vector<Vertex3D>& vertices, const std::vector<unsigned int>& indexes);
 
     std::vector<TransformationComponent*> transObj_;
     std::vector<TransformationComponent*> transObjDynamic_;
 
-    DataComponent<Dim>* dataObj_;
+    DataComponent* dataObj_;
     HitboxComponent* hitObj_;
 
     glm::mat4* models_;
