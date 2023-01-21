@@ -1,8 +1,8 @@
 #version 410
 
 in vec2 fs_tex_coord;
-in vec3 fs_pos;
-flat in vec3 fs_normals;
+in vec4 fs_pos;
+flat in vec4 fs_normals;
 
 //texture
 uniform sampler2D default_tex;
@@ -60,16 +60,16 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0) {
 vec3 lightsComputation(vec3 normals) {
     vec3 lighting;
 
-    vec3 V = normalize(eyePos - fs_pos);
+    vec3 V = normalize(eyePos - fs_pos.xyz);
     vec3 F0 = vec3(0.04); 
     F0 = mix(F0, albedo, metallic);
 
     //repeat below for mult lights
 
     // calculate per-light radiance
-    vec3 L = normalize(lightPos - fs_pos);
+    vec3 L = normalize(lightPos - fs_pos.xyz);
     vec3 H = normalize(V + L);    
-    float distance    = length(lightPos - fs_pos);
+    float distance    = length(lightPos - fs_pos.xyz);
     float attenuation = 1.0 / (distance * distance);
     vec3 radiance     = lightColor * attenuation;        
     
@@ -109,7 +109,7 @@ vec4 texturing() {
 
 void main()
 {
-    vec3 normals = normalize(fs_normals);
+    vec3 normals = normalize(fs_normals.xyz);
 
     vec3 lighting = lightsComputation(normals);
     vec4 color = texturing();

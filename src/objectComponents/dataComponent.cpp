@@ -27,12 +27,21 @@ SquareDataComponent::SquareDataComponent(const int& subdivisions) {
 	const unsigned int size = vertices.size() / 3;
 	datas_.resize(size);
 	for (unsigned int i = 0; i < size; ++i) {
-		datas_[i].pos = glm::vec3(vertices[i * 3], vertices[i * 3 + 1], vertices[i * 3 + 2]);
-		datas_[i].tex = glm::vec2(tex_coords[i * 2], tex_coords[i * 2 + 1]);
-		datas_[i].norm = glm::vec3(normals[i * 3], normals[i * 3 + 1], normals[i * 3 + 2]);
+		datas_[i].pos_x = glm::detail::toFloat16(vertices[i * 3]);
+		datas_[i].pos_y = glm::detail::toFloat16(vertices[i * 3 + 1]);
+		datas_[i].pos_z = glm::detail::toFloat16(vertices[i * 3 + 2]);
+		datas_[i].pos_a = glm::detail::toFloat16(1.0f);
+
+		datas_[i].tex_x = glm::detail::toFloat16(tex_coords[i * 2]);
+		datas_[i].tex_y = glm::detail::toFloat16(tex_coords[i * 2 + 1]);
+
+		datas_[i].norm_a = 1;
+		datas_[i].norm_z = static_cast<int>(100 * normals[i * 3]);
+		datas_[i].norm_y = static_cast<int>(100 * normals[i * 3 + 1]);
+		datas_[i].norm_x = static_cast<int>(100 * normals[i * 3 + 2]);
 	}
 
-	indexes_ = FlatDataToIndex<float, 3, true>(datas_);
+	indexes_ = FlatDataToIndex<float, true>(datas_);
 }
 
 CubeDataComponent::CubeDataComponent(const int& subdivisions, const bool& sphere) {
@@ -113,12 +122,21 @@ CubeDataComponent::CubeDataComponent(const int& subdivisions, const bool& sphere
 	const unsigned int size = vertices.size() / 3;
 	datas_.resize(size);
 	for (unsigned int i = 0; i < size; ++i) {
-		datas_[i].pos = glm::vec3(vertices[i * 3], vertices[i * 3 + 1], vertices[i * 3 + 2]);
-		datas_[i].tex = glm::vec2(tex_coords[i * 2], tex_coords[i * 2 + 1]);
-		datas_[i].norm = glm::vec3(normals[i * 3], normals[i * 3 + 1], normals[i * 3 + 2]);
+		datas_[i].pos_x = glm::detail::toFloat16(vertices[i * 3]);
+		datas_[i].pos_y = glm::detail::toFloat16(vertices[i * 3 + 1]);
+		datas_[i].pos_z = glm::detail::toFloat16(vertices[i * 3 + 2]);
+		datas_[i].pos_a = glm::detail::toFloat16(1.0f);
+
+		datas_[i].tex_x = glm::detail::toFloat16(tex_coords[i * 2]);
+		datas_[i].tex_y = glm::detail::toFloat16(tex_coords[i * 2 + 1]);
+
+		datas_[i].norm_a = 1;
+		datas_[i].norm_z = static_cast<int>(100 * normals[i * 3]);
+		datas_[i].norm_y = static_cast<int>(100 * normals[i * 3 + 1]);
+		datas_[i].norm_x = static_cast<int>(100 * normals[i * 3 + 2]);
 	}
 
-	indexes_ = FlatDataToIndex<float, 3, false>(datas_);
+	indexes_ = FlatDataToIndex<float, false>(datas_);
 }
 
 CircleDataComponent::CircleDataComponent(const unsigned int divisions, const int& subdivisions) {
@@ -181,13 +199,22 @@ CircleDataComponent::CircleDataComponent(const unsigned int divisions, const int
 		const unsigned int size = vertices.size() / 3;
 		datas_.resize(size);
 		for (unsigned int i = 0; i < size; ++i) {
-			datas_[i].pos = glm::vec3(vertices[i * 3], vertices[i * 3 + 1], vertices[i * 3 + 2]);
-			datas_[i].tex = glm::vec2(tex_coords[i * 2], tex_coords[i * 2 + 1]);
-			datas_[i].norm = glm::vec3(normals[i * 3], normals[i * 3 + 1], normals[i * 3 + 2]);
+			datas_[i].pos_x = glm::detail::toFloat16(vertices[i * 3]);
+			datas_[i].pos_y = glm::detail::toFloat16(vertices[i * 3 + 1]);
+			datas_[i].pos_z = glm::detail::toFloat16(vertices[i * 3 + 2]);
+			datas_[i].pos_a = glm::detail::toFloat16(1.0f);
+
+			datas_[i].tex_x = glm::detail::toFloat16(tex_coords[i * 2]);
+			datas_[i].tex_y = glm::detail::toFloat16(tex_coords[i * 2 + 1]);
+
+			datas_[i].norm_a = 1;
+			datas_[i].norm_z = static_cast<int>(100 * normals[i * 3]);
+			datas_[i].norm_y = static_cast<int>(100 * normals[i * 3 + 1]);
+			datas_[i].norm_x = static_cast<int>(100 * normals[i * 3 + 2]);
 		}
 	}
 
-	indexes_ = FlatDataToIndex<float, 3, true>(datas_);
+	indexes_ = FlatDataToIndex<float, true>(datas_);
 }
 
 SphereDataComponent::SphereDataComponent(const unsigned int divisions_width, const unsigned int divisions_height, const int& subdivisions, const bool displacement) {
@@ -377,13 +404,22 @@ SphereDataComponent::SphereDataComponent(const unsigned int divisions_width, con
 		const unsigned int size = vertices.size() / 3;
 		datas_.resize(size);
 		for (unsigned int i = 0; i < size; ++i) {
-			datas_[i].pos = glm::vec3(vertices[i * 3], vertices[i * 3 + 1], vertices[i * 3 + 2]);
-			datas_[i].tex = glm::vec2(tex_coords[i * 2], tex_coords[i * 2 + 1]);
-			datas_[i].norm = glm::vec3(normals[i * 3], normals[i * 3 + 1], normals[i * 3 + 2]);
+			datas_[i].pos_x = glm::detail::toFloat16(vertices[i * 3]);
+			datas_[i].pos_y = glm::detail::toFloat16(vertices[i * 3 + 1]);
+			datas_[i].pos_z = glm::detail::toFloat16(vertices[i * 3 + 2]);
+			datas_[i].pos_a = glm::detail::toFloat16(1.0f);
+
+			datas_[i].tex_x = glm::detail::toFloat16(tex_coords[i * 2]);
+			datas_[i].tex_y = glm::detail::toFloat16(tex_coords[i * 2 + 1]);
+
+			datas_[i].norm_a = 1;
+			datas_[i].norm_z = static_cast<int>(100 * normals[i * 3]);
+			datas_[i].norm_y = static_cast<int>(100 * normals[i * 3 + 1]);
+			datas_[i].norm_x = static_cast<int>(100 * normals[i * 3 + 2]);
 		}
 	}
 
-	indexes_ = FlatDataToIndex<float, 3, true>(datas_);
+	indexes_ = FlatDataToIndex<float, true>(datas_);
 }
 
 Pointer2DDataComponent::Pointer2DDataComponent() {
@@ -423,9 +459,14 @@ Pointer2DDataComponent::Pointer2DDataComponent() {
 	const unsigned int size = vertices.size() / 2;
 	datas_.resize(size);
 	for (unsigned int i = 0; i < size; ++i) {
-		datas_[i].pos = glm::vec2(vertices[i * 2], vertices[i * 2 + 1]);
-		datas_[i].tex = glm::vec2(tex_coords[i * 2], tex_coords[i * 2 + 1]);
+		datas_[i].pos_x = glm::detail::toFloat16(vertices[i * 2]);
+		datas_[i].pos_y = glm::detail::toFloat16(vertices[i * 2 + 1]);
+		datas_[i].pos_z = glm::detail::toFloat16(0.0f);
+		datas_[i].pos_a = glm::detail::toFloat16(1.0f);
+
+		datas_[i].tex_x = glm::detail::toFloat16(tex_coords[i * 2]);
+		datas_[i].tex_y = glm::detail::toFloat16(tex_coords[i * 2 + 1]);
 	}
 
-	indexes_ = FlatDataToIndex<float, 2, true>(datas_);
+	indexes_ = FlatDataToIndex<float, true>(datas_);
 }

@@ -115,12 +115,12 @@ enum TEXTURE_ALGORITHMS {
 
 class Texture {
 	public:
-	virtual void Attach2DTexture(const std::unordered_map<TEXTURE_PARAM_NAME, TEXTURE_PARAM_VALUE>& params, const TEXTURE_CHANNELS c, GLfloat* tex, const unsigned int& width, const unsigned int& height);
-	virtual void Attach2DTexture(const std::unordered_map<TEXTURE_PARAM_NAME, TEXTURE_PARAM_VALUE>& params, const TEXTURE_CHANNELS c, unsigned char* tex, const unsigned int& width, const unsigned int& height);
-	virtual void Attach2DArrayTexture(const std::unordered_map<TEXTURE_PARAM_NAME, TEXTURE_PARAM_VALUE>& params, const TEXTURE_CHANNELS c, const std::vector<GLubyte*>& tex, const unsigned int& width, const unsigned int& height);
+	template<typename T> void Attach2DTexture(const std::unordered_map<TEXTURE_PARAM_NAME, TEXTURE_PARAM_VALUE>& params, const TEXTURE_CHANNELS c, T* tex, const unsigned int& width, const unsigned int& height);
+	template<typename T> void Attach2DArrayTexture(const std::unordered_map<TEXTURE_PARAM_NAME, TEXTURE_PARAM_VALUE>& params, const TEXTURE_CHANNELS c, const std::vector<T*>& tex, const unsigned int& width, const unsigned int& height);
 	virtual void Bind(const unsigned int& channel, const unsigned int& location = 0);
 	virtual void Unbind();
 	virtual ~Texture();
+	const unsigned int& GetLayers() const { return array_2D_layers_; }
 
 	protected:
 	Texture(const TEXTURE_TARGET t);
@@ -130,7 +130,7 @@ class Texture {
 	unsigned int array_2D_layers_ = 0;
 
 	private:
-	Texture();
+	Texture() = delete;
 };
 
 class ImageTexture: public Texture {
@@ -140,27 +140,16 @@ class ImageTexture: public Texture {
 	const std::vector<std::string>& getNames() const { return texture_names_; };
 
 	private:
-	std::string texture_path_;
+	std::string texture_path_ = "";
 	std::vector<std::string> texture_names_;
 };
 
 class ProceduralTexture: public Texture {
 	public:
-	ProceduralTexture(const TEXTURE_TARGET t, const std::unordered_map<TEXTURE_PARAM_NAME, TEXTURE_PARAM_VALUE>& params, const TEXTURE_CHANNELS c, const TEXTURE_ALGORITHMS algo, const float linear_factor, const float quadratic_factor, const int width, const int height, const unsigned int seed, const bool seamless_x, const bool seamless_y, const std::vector<float>& chan_mins, const std::vector<float>& chan_maxs, const std::vector<bool>& range_attenuation);
-	~ProceduralTexture();
+	ProceduralTexture(const TEXTURE_ALGORITHMS algo, const std::vector<std::any>& algo_params, const TEXTURE_TARGET t, const std::unordered_map<TEXTURE_PARAM_NAME, TEXTURE_PARAM_VALUE>& params, const TEXTURE_CHANNELS c);
+	virtual ~ProceduralTexture();
+
+	private:
+	std::vector<std::any> procedural_parameters_;
 };
 
-class ArkNoiseProceduralTexture: public Texture {
-	public:
-	ArkNoiseProceduralTexture(const TEXTURE_TARGET t, const std::unordered_map<TEXTURE_PARAM_NAME, TEXTURE_PARAM_VALUE>& params, const TEXTURE_CHANNELS c, const unsigned int& width, const unsigned int& height, const GLfloat& frequency, const glm::vec<4, unsigned int>& verticesSeeds, const glm::vec<4, unsigned int>& edgesSeeds, const unsigned int& innerSeed);
-	~ArkNoiseProceduralTexture();
-};
-
-class BlockTexture: public Texture {
-	public:
-	BlockTexture(const std::vector<std::string>& tex_names, const std::unordered_map<TEXTURE_PARAM_NAME, TEXTURE_PARAM_VALUE>& params, const TEXTURE_CHANNELS& c);
-	virtual ~BlockTexture();
-	void Bind(const unsigned int& channel, const unsigned int& location);
-	void Unbind();
-	const unsigned int& GetLayers() const { return array_2D_layers_; }
-};

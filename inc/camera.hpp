@@ -3,7 +3,7 @@
 class Camera {
 	public:
 	Camera() = delete;
-	Camera(const float& ratio, const float& near_plane, const float& far_plane, const float& _foV, const glm::vec3& position, const unsigned char& camera_mode = CAM::FREEY | CAM::FPS, const float& camera_distance = 5.0f, const float& view_speed = 0.25f, const float& move_speed = 0.75f);
+	Camera(const float& ratio, const float& near_plane, const float& far_plane, const float& _foV, const glm::vec3& position, const unsigned char& camera_mode = CAM::FREEY | CAM::FPS, const float& camera_distance = 5.0f, const float& view_speed = 1.0f, const float& move_speed = 0.75f);
 	~Camera();
 
 	void ChangeViewSpeed(const float& view_speed);

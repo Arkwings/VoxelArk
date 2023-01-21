@@ -2,7 +2,8 @@
 
 class Window {
     public:
-    Window();
+    Window() = delete;
+    Window(GLFWwindow* shared = nullptr, const bool& visible = true, const bool& make_current = true);
     ~Window();
     Window(const Window&) = delete;
     Window& operator=(const Window&) = delete;
@@ -40,4 +41,5 @@ class Window {
     int video_count_;
 
     bool fullscreen_;
+    bool visible_;
 };

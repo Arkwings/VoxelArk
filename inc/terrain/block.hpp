@@ -527,14 +527,14 @@ inline std::unordered_map<unsigned char, std::string> block_id_name_correspondan
     { 256, "UNNAMED" }
 };
 
-template <unsigned int Dim> class DataComponent;
+class DataComponent;
 class HitboxComponent;
 class Texture;
 
 class Block {
     public:
     Block() = delete;
-    Block(const std::vector<std::string>& tex_names, DataComponent<3>* data = new CubeDataComponent(0, false), HitboxComponent* hit = new SphereHitboxComponent(new Equation<Eq::Circle>()), const std::unordered_map<TEXTURE_PARAM_NAME, TEXTURE_PARAM_VALUE>& tex_params = { {TEXTURE_MAX_LEVEL, BASE_LEVEL_9} ,  {TEXTURE_WRAP_S, CLAMP_TO_EDGE}, {TEXTURE_WRAP_T, CLAMP_TO_EDGE}, {TEXTURE_MIN_FILTER, LINEAR_MIPMAP_LINEAR}, {TEXTURE_MAG_FILTER, LINEAR} });
+    Block(const std::vector<std::string>& tex_names, DataComponent* data = new CubeDataComponent(0, false), HitboxComponent* hit = new SphereHitboxComponent(new Equation<Eq::Circle>()), const std::unordered_map<TEXTURE_PARAM_NAME, TEXTURE_PARAM_VALUE>& tex_params = { {TEXTURE_MAX_LEVEL, BASE_LEVEL_9} ,  {TEXTURE_WRAP_S, CLAMP_TO_EDGE}, {TEXTURE_WRAP_T, CLAMP_TO_EDGE}, {TEXTURE_MIN_FILTER, LINEAR_MIPMAP_LINEAR}, {TEXTURE_MAG_FILTER, LINEAR} });
     ~Block();
     Block(Block&) = delete;
     Block& operator=(const Block&) = delete;
@@ -542,12 +542,12 @@ class Block {
     void Draw(const unsigned int& index_size, const unsigned int& transfo_size);
 
     private:
-    DataComponent<3>* data_ = nullptr;
+    DataComponent* data_ = nullptr;
     HitboxComponent* hit_ = nullptr;
 
-    BlockTexture* top_tex_ = nullptr;
-    BlockTexture* side_tex_ = nullptr;
-    BlockTexture* bottom_tex_ = nullptr;
-    BlockTexture* top_over_tex_ = nullptr;
-    BlockTexture* side_over_tex_ = nullptr;
+    ImageTexture* top_tex_ = nullptr;
+    ImageTexture* side_tex_ = nullptr;
+    ImageTexture* bottom_tex_ = nullptr;
+    ImageTexture* top_over_tex_ = nullptr;
+    ImageTexture* side_over_tex_ = nullptr;
 };

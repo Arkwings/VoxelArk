@@ -1,6 +1,6 @@
 #pragma once
 
-class BlockTexture;
+class ImageTexture;
 
 class ApplicationTest {
     public:
@@ -24,10 +24,9 @@ class ApplicationTest {
     JsonLoader* texJson_ = nullptr;
     NoiseMap* noiseMap_ = nullptr;
 
-    //test
-    BlockTexture* top_tex_ = nullptr;
-    BlockTexture* side_tex_ = nullptr;
-    BlockTexture* bottom_tex_ = nullptr;
-    BlockTexture* top_over_tex_ = nullptr;
-    BlockTexture* side_over_tex_ = nullptr;
+    ImageTexture* top_tex_ = nullptr;
+    ImageTexture* side_tex_ = nullptr;
+    ImageTexture* bottom_tex_ = nullptr;
+    ImageTexture* top_over_tex_ = nullptr;
+    ImageTexture* side_over_tex_ = nullptr;
 };

@@ -36,3 +36,7 @@ MessageCallback(GLenum source,
 #define TIME_CHECK_END(functionName)    std::cout << "Time taken by function " << functionName << ": " << omp_get_wtime() - debug_timer_start << " seconds" << std::endl;
 
 #endif
+
+static inline void glfwErrorCallback(int error, const char* description) {
+    std::cerr << description << std::endl;
+}

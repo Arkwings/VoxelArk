@@ -1,7 +1,7 @@
 #include "common.hpp"
 #include "window.hpp"
 
-Window::Window()
+Window::Window(GLFWwindow* shared, const bool& visible, const bool& make_current)
     : monitors_(nullptr)
     , modes_(nullptr)
     , window_(nullptr)
@@ -17,7 +17,8 @@ Window::Window()
     , max_green_(-1)
     , max_blue_(-1)
     , max_refresh_(-1)
-    , fullscreen_(false) {
+    , fullscreen_(false)
+    , visible_(visible) {
     updateInfos();
 
     glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
@@ -26,29 +27,42 @@ Window::Window()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
-    glfwWindowHint(GLFW_DECORATED, GLFW_FALSE); //disable for test purposes
     glfwWindowHint(GLFW_RED_BITS, red_);
     glfwWindowHint(GLFW_GREEN_BITS, green_);
     glfwWindowHint(GLFW_BLUE_BITS, blue_);
     glfwWindowHint(GLFW_REFRESH_RATE, refresh_);
 
-    window_ = glfwCreateWindow(width_, height_, "GL Sandbox", nullptr, nullptr);
+    if (!visible_) {
+        glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+        window_ = glfwCreateWindow(640, 480, "", nullptr, shared);
+    }
+    else {
+        glfwWindowHint(GLFW_VISIBLE, GLFW_TRUE);
+        glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+        glfwWindowHint(GLFW_DECORATED, GLFW_FALSE); //disable for test purposes
+        window_ = glfwCreateWindow(width_, height_, "GL Sandbox", nullptr, shared);
+    }
+
     if (!window_) {
         glfwTerminate();
         exit(1);
     }
 
+    if (visible) {
     // this is for an in-game mode ( mouse trapping )
-    glfwSetInputMode(window_, GLFW_STICKY_KEYS, GL_TRUE);
-    glfwSetInputMode(window_, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-    if (glfwRawMouseMotionSupported())
-        glfwSetInputMode(window_, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+        glfwSetInputMode(window_, GLFW_STICKY_KEYS, GL_TRUE);
+        glfwSetInputMode(window_, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        if (glfwRawMouseMotionSupported())
+            glfwSetInputMode(window_, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+        glfwSwapInterval(0);    //deactivate vsync for test purposes
+    }
 
-    glfwMakeContextCurrent(window_);
+    if (make_current) {
+        glfwMakeContextCurrent(window_);
 
-    //may be useful for debug infos later
-    glfwSetTime(0.0f);
+        //may be useful for debug infos later
+        glfwSetTime(0.0f);
+    }
 }
 
 Window::~Window() {

@@ -1,8 +1,8 @@
 #version 450
 
 in vec3 fs_tex_coord;
-in vec3 fs_pos;
-in vec3 fs_normals;
+in vec4 fs_pos;
+in vec4 fs_normals;
 flat in vec3 fs_FacesOtherOther;
 
 //texture
@@ -91,14 +91,14 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0) {
 vec3 lightsComputation(vec3 normals, vec3 lightDir, vec3 lightCol) {
     vec3 lighting;
 
-    vec3 V = normalize(eyePos - fs_pos);
+    vec3 V = normalize(eyePos - fs_pos.xyz);
     vec3 F0 = vec3(0.04); 
     F0 = mix(F0, albedo, metallic);
 
     //repeat below for mult lights
 
     // calculate per-light radiance
-    // vec3 L = normalize(lightPos - fs_pos);
+    // vec3 L = normalize(lightPos - fs_pos.xyz);
     vec3 L = lightDir;
     vec3 H = normalize(V + L);    
     float distance    = 6.0f;
@@ -130,7 +130,7 @@ vec3 simplifiedLight(vec3 normals, vec3 lightDir, vec3 lightCol) {
     float diff = max(dot(normals, lightDir), 0.0);
     vec3 diffuse = diff * lightCol * diffStrength;
 
-    vec3 eyeDir    = normalize(eyePos - fs_pos);
+    vec3 eyeDir    = normalize(eyePos - fs_pos.xyz);
     vec3 halfwayDir = normalize(lightDir + eyeDir);
     // vec3 reflectDir = reflect(-lightDir, normals);
 
@@ -149,27 +149,27 @@ vec3 simplifiedLight(vec3 normals, vec3 lightDir, vec3 lightCol) {
 vec4 texturing(vec3 normals, float faces) {     
 
     if(faces >= 32) {
-        if(normals.z < 0) discard;
+        if(normals.z < -0.1) discard;
         faces = faces - 32;
     }
     if(faces >= 16) {
-        if(normals.z > 0) discard;
+        if(normals.z > 0.1) discard;
         faces = faces - 16;
     }
     if(faces >= 8) {
-        if(normals.x < 0) discard;
+        if(normals.x < -0.1) discard;
         faces = faces - 8;
     }
     if(faces >= 4) {
-        if(normals.x > 0) discard;
+        if(normals.x > 0.1) discard;
         faces = faces - 4;
     }
     if(faces >= 2) {
-        if(normals.y < 0) discard;
+        if(normals.y < -0.1) discard;
         faces = faces - 2;
     }
     if(faces >= 1) {
-        if(normals.y > 0) discard;
+        if(normals.y > 0.1) discard;
     }
 
     vec4 color = vec4(fs_tex_coord.z, 0.0, 0.0, 1.0);
@@ -205,7 +205,7 @@ vec4 texturing(vec3 normals, float faces) {
     else
         color = texture(side_samplers, vec3(tex_coord, max(0, min(side_layers - 1, floor(side_layer + 0.5)))));
 
-    if(color.a < 0.1f || selected == fs_pos) discard;
+    if(color.a < 0.1f || selected == fs_pos.xyz) discard;
 
     //for selection
     if(isSelectedBlock == 1
@@ -238,7 +238,7 @@ vec4 texturing(vec3 normals, float faces) {
 
 void main()
 {
-    vec3 normals = normalize(fs_normals);
+    vec3 normals = normalize(fs_normals.xyz);
     
     vec3 lighting = vec3(ambientStrength);
     //simple

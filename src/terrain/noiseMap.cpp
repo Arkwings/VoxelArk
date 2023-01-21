@@ -10,10 +10,8 @@
 #include "terrain/chunk.hpp"
 #include "terrain/noiseMap.hpp"
 
-NoiseMap::NoiseMap()
-    : chunks_(new Chunk** [OPT::MAX_CHUNKS])
-    , blocks_(OPT::MAX_BLOCKS, nullptr) {
-    TIME_CHECK_START();
+NoiseMap::NoiseMap() {
+    // TIME_CHECK_START();
 
 #pragma omp parallel for
     for (int i = 0; i < OPT::MAX_CHUNKS; ++i) {
@@ -35,11 +33,14 @@ NoiseMap::NoiseMap()
         res.clear();
     }
 
-    TIME_CHECK_END("ctr");
+    // TIME_CHECK_END("ctr");
 }
 
 NoiseMap::~NoiseMap() {
-    for (unsigned int i = 0; i < OPT::MAX_CHUNKS; ++i)
+    delete chunk_GL_init_scheduler_;
+
+#pragma omp parallel for
+    for (int i = 0; i < OPT::MAX_CHUNKS; ++i)
         delete[] chunks_[i];
     delete[] chunks_;
 
@@ -53,35 +54,37 @@ void NoiseMap::LoadChunks(const glm::vec3& pos) {
 
     Chunk** chk = nullptr;
 
+    if (chunks_ == nullptr)  return;
+
     for (z1 = zmin; z1 < zmax; ++z1) {
         zdist = (z1 - z) * (z1 - z);
 
         for (x1 = xmin; x1 < xmax; ++x1) {
-            //if ((x1 - x) * (x1 - x) + zdist <= static_cast<int>(OPT::RENDER_DISTANCE) + 1.5f) {
 
-            chk = GetChunk(x1, z1);
-            if (*chk == nullptr) {
-                if (chunks_in_thread_use_.find({ x1,z1 }) == chunks_in_thread_use_.end()) {   //we do the max we can asyncronously
-                    chunks_in_thread_use_.insert({ x1, z1 });
-                    if (!loadChunkFromFile(x1, z1)) {
-                        G_ThreadPool->QueueJob(std::bind(&NoiseMap::genChunk, this, x1, z1));
-                        //genChunk(x1, z1);
-                    }
+            if ((x1 - x) * (x1 - x) + zdist <= OPT::RENDER_DISTANCE) {
+                chk = GetChunk(x1, z1);
+                size_t chunk_hash;
+                hash_combine(chunk_hash, x1, z1);
+
+                if ((*chk) == nullptr && chunk_used_cpu_.find(chunk_hash) == chunk_used_cpu_.end()) {
+                    chunk_used_cpu_.insert(chunk_hash);
+                    G_ThreadPool->QueueJob(std::bind(&NoiseMap::CPULoad, this, x1, z1));
+                }
+                if ((*chk) != nullptr && (*chk)->loaded_ == OGL::CPU_LOADED && chunk_used_gpu_.find(chunk_hash) == chunk_used_gpu_.end()) {
+                    chunk_used_gpu_.insert(chunk_hash);
+                    G_OGLThreadPool->QueueJob(std::bind(&NoiseMap::GPULoad, this, x1, z1));
                 }
             }
-            else {  //we do the gl stuff when the rest is done
-                if ((*chk)->points_loaded_ && !(*chk)->graphics_loaded_) {
-                    (*chk)->PrepareDraw();
-                    std::cout << "prep chunk " << x1 << " " << z1 << std::endl;
-                }
-            }
-        //}
         }
     }
 }
 
 void NoiseMap::UnloadChunk(const int& x, const int& z) {
 
+}
+
+void NoiseMap::Load() {
+    chunk_GL_init_scheduler_->CheckTime();
 }
 
 void NoiseMap::Draw(const glm::vec3& position) {
@@ -122,11 +125,13 @@ void NoiseMap::Draw(const glm::vec3& position) {
         zdist = (z1 - z) * (z1 - z);
         for (x1 = xmin; x1 < xmax; ++x1) {
             chk = GetChunk(x1, z1);
-            if ((x1 - x) * (x1 - x) + zdist <= OPT::RENDER_DISTANCE && *chk != nullptr && (*chk)->graphics_loaded_) {
-                (*chk)->Draw();
+            if ((x1 - x) * (x1 - x) + zdist <= OPT::RENDER_DISTANCE && *chk != nullptr && (*chk)->loaded_ == OGL::GPU_LOADED) {
+                (*chk)->Draw(active_buffer_);
             }
         }
     }
+
+    if (OPT::BUFFER_SWAPPING)    active_buffer_ = 1 - active_buffer_;
 }
 
 void NoiseMap::SetChunkOnCamera() {
@@ -146,7 +151,7 @@ void NoiseMap::SetChunkOnCamera() {
         if (static_cast<float>(x) != xf
             && static_cast<float>(z) != zf
             && *chk != nullptr
-            && (*chk)->graphics_loaded_
+            && (*chk)->loaded_ == OGL::GPU_LOADED
             && (*chk)->SetBlockOnCamera(
                 static_cast<int>((lookingPoint.x + 0.5f) - x * static_cast<int>(OPT::CHUNK_SIZE)),
                 static_cast<int>((lookingPoint.z + 0.5f) - z * static_cast<int>(OPT::CHUNK_SIZE)))) {
@@ -161,11 +166,32 @@ void NoiseMap::SetChunkOnCamera() {
 
 }
 
+void NoiseMap::CPULoad(const int& x, const int& z) {
+    Chunk** chunk = GetChunk(x, z);
+    (*chunk) = new Chunk();
+    if (!loadChunkFromFile(x, z))
+        genChunk(x, z);
+
+    (*chunk)->loaded_ = OGL::CPU_LOADED;
+}
+
+void NoiseMap::GPULoad(const int& x, const int& z) {
+    Chunk** chunk = GetChunk(x, z);
+    (*chunk)->SetBuffers();
+
+    (*chunk)->loaded_ = OGL::GPU_LOADED;
+}
+
 bool NoiseMap::loadChunkFromFile(const int& x, const int& y) {
+
     return false;
 }
 
 void NoiseMap::genChunk(const int& x, const int& z) {
+    // TIME_CHECK_START();
+
+    Chunk** chunk = GetChunk(x, z);
+
     size_t hashX, hashY, hashXX, hashYY;
     size_t hashXY, hashXXY, hashXYY, hashXXYY;
     hash_combine(hashX, x, OPT::MAP_SEED);
@@ -179,20 +205,16 @@ void NoiseMap::genChunk(const int& x, const int& z) {
 
     std::mt19937 generator(hashXY);
     std::uniform_int_distribution<uint32_t> distribution(0, 0xffffffff);
-    Generation::ArkNoise<GLfloat>* noise_map = new Generation::ArkNoise<GLfloat>(OPT::CHUNK_SIZE, OPT::CHUNK_SIZE, 4.0f);
+    Generation::ArkNoise<GLfloat>* noise_map = new Generation::ArkNoise<GLfloat>(OPT::CHUNK_SIZE, OPT::CHUNK_SIZE, static_cast<GLfloat>(OPT::CHUNK_SIZE / 16.0f));
     noise_map->GenerateGradients(glm::vec4(hashXY, hashXXY, hashXYY, hashXXYY), glm::vec4(hashX, hashXX, hashY, hashYY), static_cast<uint32_t>(distribution(generator)));
     noise_map->GeneratePoints(false, 3, 0.1f, 0.5f);
 
-    Chunk** chunk = GetChunk(x, z);
-    *chunk = new Chunk();
     (**chunk).AddNoiseTerain(noise_map->GetPoints());
     (**chunk).SetupTransfos(x, z);
+
     delete noise_map;
 
-    chunks_in_thread_use_.erase({ x, z });
-    std::cout << "gen chunk " << x << " " << z << std::endl;
-
-    chunks_in_thread_use_.erase({ x, z });
+// TIME_CHECK_END("generate chunk");
 }
 
 void NoiseMap::saveChunkInFile(const int& x, const int& z) {
