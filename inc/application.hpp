@@ -21,7 +21,7 @@ class Application {
     void Run();
 
     private:
-    void update(GameState& gs, const std::chrono::nanoseconds& delta);
+    void update(GameState& gs, const double& delta);
     void render(GameState const& interpolated_gs);
     void interpolate(GameState const& current_gs, GameState const& previous_gs, GameState& interpolated_gs, float alpha);
 

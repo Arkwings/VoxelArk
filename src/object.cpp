@@ -95,19 +95,19 @@ template void Object<2>::DrawDynamic(const unsigned int& drawPrimitives, const u
 template void Object<3>::DrawDynamic(const unsigned int& drawPrimitives, const unsigned int& shaderID);
 
 template<unsigned int Dim>
-void Object<Dim>::SetData(DataComponent<Dim>* dataComp) {
+void Object<Dim>::SetData(DataComponent* dataComp) {
 	if (dataObj_ != nullptr) delete dataObj_;
 	dataObj_ = dataComp;
 
-	const std::vector<Vertex<Dim>>& vertices(dataObj_->GetData());
+	const std::vector<Vertex3D>& vertices(dataObj_->GetData());
 	const std::vector<unsigned int>& indexes(dataObj_->GetIndexes());
 	indexed_ = dataObj_->GetIndexed();
 	drawSize_ = indexed_ ? indexes.size() : vertices.size();
 
 	addDatas(vertices, indexes);
 }
-template void Object<2>::SetData(DataComponent<2>* dataComp);
-template void Object<3>::SetData(DataComponent<3>* dataComp);
+template void Object<2>::SetData(DataComponent* dataComp);
+template void Object<3>::SetData(DataComponent* dataComp);
 
 template<unsigned int Dim>
 void Object<Dim>::SetStaticModels() {
@@ -119,9 +119,11 @@ void Object<Dim>::SetStaticModels() {
 		models_[i] = transObj_[i]->GetModel();
 	}
 
-	glBindVertexArray(vao_);
+	G_OGLThreadPool->QueueJob([&]() {
 
-	//tranform mat for instanced rendering
+		glBindVertexArray(vao_);
+
+		//tranform mat for instanced rendering
 	glGenBuffers(1, &mbo_);
 	glBindBuffer(GL_ARRAY_BUFFER, mbo_);
 	glBufferData(GL_ARRAY_BUFFER, instanceSize_ * sizeof(glm::mat4), &models_[0], GL_STATIC_DRAW);
@@ -141,6 +143,9 @@ void Object<Dim>::SetStaticModels() {
 	glVertexAttribDivisor(10, 1);
 
 	glBindVertexArray(0);
+		});
+
+	while (!G_OGLThreadPool->IsIdle()) {}
 }
 template void Object<2>::SetStaticModels();
 template void Object<3>::SetStaticModels();
@@ -186,14 +191,15 @@ template void Object<2>::CheckOnCamera(unsigned int& transIndex);
 template void Object<3>::CheckOnCamera(unsigned int& transIndex);
 
 template <unsigned int Dim>
-void Object<Dim>::addDatas(const std::vector<Vertex<Dim>>& vertices, const std::vector<unsigned int>& indexes) {
+void Object<Dim>::addDatas(const std::vector<Vertex3D>& vertices, const std::vector<unsigned int>& indexes) {
 
-	glGenVertexArrays(1, &vao_);
+	G_OGLThreadPool->QueueJob([&]() {
+		glGenVertexArrays(1, &vao_);
 	glBindVertexArray(vao_);
 
 	glGenBuffers(1, &vbo_);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo_);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex<Dim>) * vertices.size(), vertices.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex3D) * vertices.size(), vertices.data(), GL_STATIC_DRAW);
 
 	if (indexed_) {
 		glGenBuffers(1, &ebo_);
@@ -202,27 +208,30 @@ void Object<Dim>::addDatas(const std::vector<Vertex<Dim>>& vertices, const std::
 	}
 
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, Dim, GL_FLOAT, GL_FALSE, sizeof(Vertex<Dim>), (void*)0);
+	glVertexAttribPointer(0, 4, GL_HALF_FLOAT, GL_FALSE, sizeof(Vertex3D), (void*)OGL::POS_OFFSET);
 
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex<Dim>), (void*)offsetof(Vertex<Dim>, tex));
+	glVertexAttribPointer(1, 2, GL_HALF_FLOAT, GL_FALSE, sizeof(Vertex3D), (void*)OGL::TEX_OFFSET);
 
 	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, Dim, GL_FLOAT, GL_FALSE, sizeof(Vertex<Dim>), (void*)offsetof(Vertex<Dim>, norm));
+	glVertexAttribPointer(2, 4, GL_INT_2_10_10_10_REV, GL_TRUE, sizeof(Vertex3D), (void*)OGL::NORM_OFFSET);
 
 	glEnableVertexAttribArray(3);
-	glVertexAttribPointer(3, Dim, GL_FLOAT, GL_FALSE, sizeof(Vertex<Dim>), (void*)offsetof(Vertex<Dim>, tan));
+	glVertexAttribPointer(3, 4, GL_INT_2_10_10_10_REV, GL_TRUE, sizeof(Vertex3D), (void*)OGL::TAN_OFFSET);
 
 	glEnableVertexAttribArray(4);
-	glVertexAttribPointer(4, Dim, GL_FLOAT, GL_FALSE, sizeof(Vertex<Dim>), (void*)offsetof(Vertex<Dim>, bitan));
+	glVertexAttribPointer(4, 4, GL_INT_2_10_10_10_REV, GL_TRUE, sizeof(Vertex3D), (void*)OGL::BITAN_OFFSET);
 
 	glEnableVertexAttribArray(5);
-	glVertexAttribIPointer(5, MAX_BONE_INFLUENCE, GL_INT, sizeof(Vertex<Dim>), (void*)offsetof(Vertex<Dim>, boneIDs));
+	glVertexAttribIPointer(5, OGL::MAX_BONE_INFLUENCE, GL_UNSIGNED_BYTE, sizeof(Vertex3D), (void*)OGL::BONEIDS_OFFSET);
 
 	glEnableVertexAttribArray(6);
-	glVertexAttribPointer(6, MAX_BONE_INFLUENCE, GL_FLOAT, GL_FALSE, sizeof(Vertex<Dim>), (void*)offsetof(Vertex<Dim>, weights));
+	glVertexAttribPointer(6, OGL::MAX_BONE_INFLUENCE, GL_HALF_FLOAT, GL_FALSE, sizeof(Vertex3D), (void*)OGL::WEIGHTS_OFFSET);
 
 	glBindVertexArray(0);
+		});
+
+	while (!G_OGLThreadPool->IsIdle()) {}
 }
-template void Object<2>::addDatas(const std::vector<Vertex<2>>& vertices, const std::vector<unsigned int>& indexes);
-template void Object<3>::addDatas(const std::vector<Vertex<3>>& vertices, const std::vector<unsigned int>& indexes);
+template void Object<2>::addDatas(const std::vector<Vertex3D>& vertices, const std::vector<unsigned int>& indexes);
+template void Object<3>::addDatas(const std::vector<Vertex3D>& vertices, const std::vector<unsigned int>& indexes);

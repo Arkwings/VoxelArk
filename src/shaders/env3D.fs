@@ -46,6 +46,6 @@ void main()
     else {
         color = vec4(0.1,0.1,0.1,1.0);
     }
-
+    
     gl_Color = vec4(color);
 }

@@ -11,11 +11,10 @@
 #include "terrain/chunk.hpp"
 
 Chunk::Chunk()
-    : blocks_(OPT::MAX_BLOCKS)
-    , points_loaded_(false)
-    , graphics_loaded_(false) {
-    blocks_pos_ = new unsigned char** [OPT::MAP_HEIGHT];
+    : blocks_(OPT::MAX_BLOCKS) {
     //TIME_CHECK_START();
+
+    blocks_pos_ = new unsigned char** [OPT::MAP_HEIGHT];
 #pragma omp parallel for
     for (int y = 0; y < OPT::MAP_HEIGHT; ++y) {
         blocks_pos_[y] = new unsigned char* [OPT::CHUNK_SIZE];
@@ -59,7 +58,6 @@ void Chunk::AddNoiseTerain(GLfloat* noisePoints) {
         std::mt19937 generator(seed);
         std::uniform_int_distribution<uint32_t> distribution(4, 7);
         unsigned int dirty = y - distribution(generator); // [4-6] dirt blocks under the grass
-        // unsigned int dirty = y - (rand() / RAND_MAX) * 2 - 4; // [4-6] dirt blocks under the grass
 
         while (y != 1 && y != dirty) blocks_pos_[--y][z][x] = BLOCKS::DIRT;
         while (y != 1) blocks_pos_[--y][z][x] = BLOCKS::STONE;
@@ -69,10 +67,10 @@ void Chunk::AddNoiseTerain(GLfloat* noisePoints) {
 }
 
 void Chunk::SetupTransfos(const int& xpos, const int& zpos) {
-    TIME_CHECK_START();
+    // TIME_CHECK_START();
 
-    std::vector<std::vector<glm::vec3>> transfos(OPT::MAX_BLOCKS);
-    std::vector<std::vector<float>> neighbours(OPT::MAX_BLOCKS);
+    std::vector<std::vector<glm::mat<4, 4, glm::u16>>> transfos(OPT::MAX_BLOCKS);
+    std::vector<std::vector<glm::vec<3, glm::u16>>> neighbours(OPT::MAX_BLOCKS);
     int y, z, x;
     int nei;
     int i;
@@ -94,41 +92,44 @@ void Chunk::SetupTransfos(const int& xpos, const int& zpos) {
                     if (z - 1 >= 0 && blocks_pos_[y][z - 1][x] != BLOCKS::AIR)                  nei |= 32;
 
                     if (nei != 63) {
-                        transfos[blocks_pos_[y][z][x]].push_back(glm::vec3(x + xdiff, y + ydiff, z + zdiff));
-                        neighbours[blocks_pos_[y][z][x]].push_back(static_cast<float>(nei));
+                        transfos[blocks_pos_[y][z][x]].push_back(std::move(
+                            glm::mat<4, 4, glm::u16>(
+                                static_cast<glm::u16>(glm::detail::toFloat16(1.0f)), 0, 0, 0,
+                                0, static_cast<glm::u16>(glm::detail::toFloat16(1.0f)), 0, 0,
+                                0, 0, static_cast<glm::u16>(glm::detail::toFloat16(1.0f)), 0,
+                                glm::detail::toFloat16(x + xdiff), glm::detail::toFloat16(y + ydiff), glm::detail::toFloat16(z + zdiff), static_cast<glm::u16>(glm::detail::toFloat16(1.0f)))
+                        ));
+                        neighbours[blocks_pos_[y][z][x]].push_back(std::move(
+                            glm::vec<3, glm::u16>(glm::detail::toFloat16(static_cast<float>(nei)), 0, 0)
+                        ));
                     }
                 }
             }
         }
-        // std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
 
+#pragma omp parallel for
     for (i = 1; i < OPT::MAX_BLOCKS; ++i) { //we skip AIR
         blocks_[i].SetTransfos(transfos[i]);
         blocks_[i].SetNeighbours(neighbours[i]);
-
-        // std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
 
-    points_loaded_ = true;
-
-    TIME_CHECK_END("setuptransfos");
+    // TIME_CHECK_END("setuptransfos");
 }
 
-void Chunk::PrepareDraw() {
-    TIME_CHECK_START();
+void Chunk::SetBuffers() {
+    // TIME_CHECK_START();
 
-    for (int i = 1; i < OPT::MAX_BLOCKS; ++i) {
-        blocks_[i].SetArrays(); //gpu stuff, unparallelizable
+    for (unsigned int i = 1; i < OPT::MAX_BLOCKS; ++i) {
+        blocks_[i].SetBuffers();
     }
 
-    graphics_loaded_ = true;
-    TIME_CHECK_END("prepare draw");
+    // TIME_CHECK_END("prepare draw");
 }
 
-void Chunk::Draw() {
+void Chunk::Draw(const unsigned int& active_buffer) {
     for (unsigned int i = 1U; i < OPT::MAX_BLOCKS; ++i) { //we skip AIR
-        blocks_[i].Draw(i);
+        blocks_[i].Draw(i, active_buffer);
     }
 }
 

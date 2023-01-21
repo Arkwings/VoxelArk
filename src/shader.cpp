@@ -72,6 +72,7 @@ void Shader::Recompile() {
 		debug_file_ = new std::ofstream(shader_path_ + debug_file_path_, std::ofstream::out);
 
 		glDeleteProgram(shaderID_);
+
 		compile();
 	}
 }

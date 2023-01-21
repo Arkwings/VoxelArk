@@ -8,6 +8,7 @@
 #include <ostream>
 #include <filesystem>
 #include <optional>
+#include <type_traits>
 
 #include <chrono>
 #include <thread>
@@ -51,6 +52,9 @@
 #include "glm/gtx/transform.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
+#include "glm/gtc/type_precision.hpp"
+#include "glm/ext/matrix_float4x4_precision.hpp"
+#include "glm/ext/vector_float4_precision.hpp"
 
 #pragma warning(pop)
 
@@ -71,6 +75,8 @@
 #include "utils/hash.hpp"
 #include "utils/jsonLoader.hpp"
 #include "utils/threadpool.hpp"
+#include "utils/scheduler.hpp"
+#include "utils/typeTest.hpp"
 
 #include "algorithms/equation.hpp"
 #include "algorithms/arkGen.hpp"

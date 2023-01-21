@@ -13,16 +13,12 @@
 
 using namespace std::chrono_literals;
 
-static void glfwErrorCallback(int error, const char* description) {
-    std::cerr << description << std::endl;
-}
-
 ApplicationTest::ApplicationTest() {
 
     //glfw
     if (!glfwInit()) throw std::runtime_error("glfw init failed");
     glfwSetErrorCallback(glfwErrorCallback);
-    window_ = new Window();
+    window_ = new Window(nullptr, true, true);
     event_ = new Event();
     G_Window = window_;
     G_Event = event_;
@@ -66,15 +62,16 @@ ApplicationTest::ApplicationTest() {
     G_ObjectHandler3D = objectHandler3D_;
 
     //test
-    top_tex_ = new BlockTexture({ "dirt/dirt_top.png","dirt/dirt_top_01.png","dirt/dirt_top_02.png" }, { {TEXTURE_MAX_LEVEL, BASE_LEVEL_4} , {TEXTURE_WRAP_S, CLAMP_TO_EDGE}, {TEXTURE_WRAP_T, CLAMP_TO_EDGE}, {TEXTURE_MIN_FILTER, LINEAR_MIPMAP_LINEAR}, {TEXTURE_MAG_FILTER, LINEAR} }, BGR);
-    side_tex_ = new BlockTexture({ "dirt/dirt.png","dirt/dirt_01.png","dirt/dirt_02.png" }, { {TEXTURE_MAX_LEVEL, BASE_LEVEL_4} ,  {TEXTURE_WRAP_S, CLAMP_TO_EDGE}, {TEXTURE_WRAP_T, CLAMP_TO_EDGE}, {TEXTURE_MIN_FILTER, LINEAR_MIPMAP_LINEAR}, {TEXTURE_MAG_FILTER, LINEAR} }, BGR);
-    bottom_tex_ = new BlockTexture({ "dirt/dirt_top.png" }, { {TEXTURE_MAX_LEVEL, BASE_LEVEL_4} ,  {TEXTURE_WRAP_S, CLAMP_TO_EDGE}, {TEXTURE_WRAP_T, CLAMP_TO_EDGE}, {TEXTURE_MIN_FILTER, LINEAR_MIPMAP_LINEAR}, {TEXTURE_MAG_FILTER, LINEAR} }, BGR);
-    top_over_tex_ = new BlockTexture({}, { {TEXTURE_MAX_LEVEL, BASE_LEVEL_4} ,  {TEXTURE_WRAP_S, CLAMP_TO_EDGE}, {TEXTURE_WRAP_T, CLAMP_TO_EDGE}, {TEXTURE_MIN_FILTER, LINEAR_MIPMAP_LINEAR}, {TEXTURE_MAG_FILTER, LINEAR} }, BGRA);
-    side_over_tex_ = new BlockTexture({}, { {TEXTURE_MAX_LEVEL, BASE_LEVEL_4} ,  {TEXTURE_WRAP_S, CLAMP_TO_EDGE}, {TEXTURE_WRAP_T, CLAMP_TO_EDGE}, {TEXTURE_MIN_FILTER, LINEAR_MIPMAP_LINEAR}, {TEXTURE_MAG_FILTER, LINEAR} }, BGRA);
+    top_tex_ = new ImageTexture({ "dirt/dirt_top.png","dirt/dirt_top_01.png","dirt/dirt_top_02.png" }, TEXTURE_2D_ARRAY, { {TEXTURE_MAX_LEVEL, BASE_LEVEL_4} , {TEXTURE_WRAP_S, CLAMP_TO_EDGE}, {TEXTURE_WRAP_T, CLAMP_TO_EDGE}, {TEXTURE_MIN_FILTER, LINEAR_MIPMAP_LINEAR}, {TEXTURE_MAG_FILTER, LINEAR} }, BGR);
+    side_tex_ = new ImageTexture({ "dirt/dirt.png","dirt/dirt_01.png","dirt/dirt_02.png" }, TEXTURE_2D_ARRAY, { {TEXTURE_MAX_LEVEL, BASE_LEVEL_4} ,  {TEXTURE_WRAP_S, CLAMP_TO_EDGE}, {TEXTURE_WRAP_T, CLAMP_TO_EDGE}, {TEXTURE_MIN_FILTER, LINEAR_MIPMAP_LINEAR}, {TEXTURE_MAG_FILTER, LINEAR} }, BGR);
+    bottom_tex_ = new ImageTexture({ "dirt/dirt_top.png" }, TEXTURE_2D_ARRAY, { {TEXTURE_MAX_LEVEL, BASE_LEVEL_4} ,  {TEXTURE_WRAP_S, CLAMP_TO_EDGE}, {TEXTURE_WRAP_T, CLAMP_TO_EDGE}, {TEXTURE_MIN_FILTER, LINEAR_MIPMAP_LINEAR}, {TEXTURE_MAG_FILTER, LINEAR} }, BGR);
+    top_over_tex_ = new ImageTexture({}, TEXTURE_2D_ARRAY, { {TEXTURE_MAX_LEVEL, BASE_LEVEL_4} ,  {TEXTURE_WRAP_S, CLAMP_TO_EDGE}, {TEXTURE_WRAP_T, CLAMP_TO_EDGE}, {TEXTURE_MIN_FILTER, LINEAR_MIPMAP_LINEAR}, {TEXTURE_MAG_FILTER, LINEAR} }, BGRA);
+    side_over_tex_ = new ImageTexture({}, TEXTURE_2D_ARRAY, { {TEXTURE_MAX_LEVEL, BASE_LEVEL_4} ,  {TEXTURE_WRAP_S, CLAMP_TO_EDGE}, {TEXTURE_WRAP_T, CLAMP_TO_EDGE}, {TEXTURE_MIN_FILTER, LINEAR_MIPMAP_LINEAR}, {TEXTURE_MAG_FILTER, LINEAR} }, BGRA);
 }
 
 ApplicationTest::~ApplicationTest() {
 
+    delete G_OGLThreadPool;
     delete G_ThreadPool;
 
     glfwTerminate();

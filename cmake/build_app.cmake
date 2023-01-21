@@ -19,10 +19,12 @@ target_link_directories(${CMAKE_PROJECT_NAME} PUBLIC
 "$ENV{GLAD_PATH}/lib"
 "$ENV{FREEIMG_PATH}/lib")
 target_compile_options(${CMAKE_PROJECT_NAME} PUBLIC 
-"/std:c++20" 
-"/openmp" 
-"/Zc:__cplusplus" 
-"/bigobj"
+"/std:c++20"          #set c++ 20 standard
+"/openmp"             #enables use of openmp for parallelization
+"/Zc:__cplusplus"     #enables c++ macro to have the suported standard
+"/Zc:inline"          #removed unreferenced or COMDAT data and func
+"/bigobj"             #permits bigger .obj
+#"/GR-"                #disable rtti (runtime type info), can't use dynamic cast or typeid with it
 # "$<$<CONFIG:DEBUG>:/fsanitize=address>" 
 "$<$<CONFIG:DEBUG>:/Od>"
 "$<$<CONFIG:DEBUG>:/sdl>"

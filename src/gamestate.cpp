@@ -32,9 +32,10 @@ void GameState::Update(const float delta_time) {
 
     G_CameraHandler->GetActive()->SetLooking();
 
-    if (position_updated_) {
-        G_NoiseMap->LoadChunks(G_CameraHandler->GetActive()->getPos());
-    }
+    // if (position_updated_) {
+    G_NoiseMap->LoadChunks(G_CameraHandler->GetActive()->getPos());
+    // }
 
+    G_NoiseMap->Load();
     G_NoiseMap->SetChunkOnCamera();
 }
