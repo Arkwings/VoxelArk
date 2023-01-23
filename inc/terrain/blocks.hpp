@@ -17,17 +17,15 @@ class Blocks {
     Blocks();
     ~Blocks();
 
-    // void SetNeighbours(const std::vector<float>& neighbours);
-    // void SetTransfos(const std::vector<glm::vec<3, glm::u16>>& transfos);
-    void SetNeighbours(const std::vector<glm::vec<3, glm::u16>>& neighbours);
-    void SetTransfos(const std::vector<glm::mat<4, 4, glm::u16>>& transfos);
-    void AddTransfo(const glm::vec<3, glm::u16>& transfo);
-    void RemoveTransfo(const glm::vec<3, glm::u16>& transfo);
+    void SetNeighbours(std::vector<glm::vec<3, glm::u16>>& neighbours);
+    void SetTransfos(std::vector<glm::mat4>& transfos);
+    void AddTransfo(const glm::vec3& transfo);
+    void RemoveTransfo(const glm::vec3& transfo);
     void SetBuffers();
     void Draw(const unsigned int& ID, const unsigned int& active_buffer);
 
     private:
-    std::vector <glm::mat<4, 4, glm::u16>> transfos_;
+    std::vector <glm::mat4> transfos_;
     std::vector<glm::vec<3, glm::u16>> neighbours_;      // x: 0->none, 1 -> top, 2-> bottom, 4-> left, 8->right, 16->front, 32->back, binary and comparison
     const std::vector<Vertex3D>& vertices_;
     const std::vector<unsigned int>& indexes_;
