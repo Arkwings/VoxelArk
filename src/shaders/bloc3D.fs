@@ -35,7 +35,7 @@ uniform vec3 sunColor = vec3(1.0, 0.9, 0.7);
 uniform vec3 moonColor = vec3(0.4, 0.3, 0.6);
 uniform float rotation;
 
-uniform float ambientStrength = 0.15f;
+uniform float ambientStrength = 0.2f;
 uniform float diffStrength = 0.7f;
 uniform float shininess = 16.0f;
 uniform float specularStrength = 16.0f;
@@ -198,9 +198,9 @@ vec4 texturing(vec3 normals, float faces) {
 	    tex_coord.x -= cos(tex_coord.x*tex_scale+displacement*tex_speed)/tex_strength;
     }
 
-    if(normals.y > 0)
+    if(normals.y > 0.5f)
         color = texture(top_samplers, vec3(tex_coord, max(0, min(top_layers - 1, floor(top_layer + 0.5))) ));
-    else if(normals.y < 0)
+    else if(normals.y < -0.5f)
         color = texture(bottom_samplers, vec3(tex_coord, max(0, min(bottom_layers - 1, floor(bottom_layer + 0.5)))));
     else
         color = texture(side_samplers, vec3(tex_coord, max(0, min(side_layers - 1, floor(side_layer + 0.5)))));
