@@ -19,25 +19,25 @@ Blocks::Blocks()
 
 Blocks::~Blocks() {}
 
-void Blocks::SetNeighbours(const std::vector<glm::vec<3, glm::u16>>& neighbours) {
-    neighbours_ = neighbours;
+void Blocks::SetNeighbours(std::vector<glm::vec<3, glm::u16>>& neighbours) {
+    neighbours_ = std::move(neighbours);
 }
 
-void Blocks::SetTransfos(const std::vector<glm::mat<4, 4, glm::u16>>& transfos) {
-    transfos_ = transfos;
+void Blocks::SetTransfos(std::vector<glm::mat4>& transfos) {
+    transfos_ = std::move(transfos);
 }
 
-void Blocks::AddTransfo(const glm::vec<3, glm::u16>& transfo) {
+void Blocks::AddTransfo(const glm::vec3& transfo) {
     transfos_.push_back(
-        glm::mat<4, 4, glm::u16>(
-            static_cast<glm::u16>(glm::detail::toFloat16(1.0f)), 0, 0, 0,
-            0, static_cast<glm::u16>(glm::detail::toFloat16(1.0f)), 0, 0,
-            0, 0, static_cast<glm::u16>(glm::detail::toFloat16(1.0f)), 0,
-            transfo[0], transfo[1], transfo[2], static_cast<glm::u16>(glm::detail::toFloat16(1.0f))
-            ));
+        glm::mat4(
+            1.0f, 0, 0, 0,
+            0, 1.0f, 0, 0,
+            0, 0, 1.0f, 0,
+            transfo[0], transfo[1], transfo[2], 1.0f
+        ));
 }
 
-void Blocks::RemoveTransfo(const glm::vec<3, glm::u16>& transfo) {
+void Blocks::RemoveTransfo(const glm::vec3& transfo) {
     for (unsigned int i = 0; i < transfos_.size(); ++i) {
         if (transfos_[i][0][3] == transfo.x && transfos_[i][1][3] == transfo.y && transfos_[i][2][3] == transfo.z) {
             transfos_.erase(transfos_.begin() + i);
@@ -87,16 +87,16 @@ void Blocks::SetBuffers() {
         glVertexAttribPointer(6, OGL::MAX_BONE_INFLUENCE, GL_HALF_FLOAT, GL_FALSE, sizeof(Vertex3D), (void*)OGL::WEIGHTS_OFFSET);
 
         glBindBuffer(GL_ARRAY_BUFFER, mbo_[0]);
-        glBufferData(GL_ARRAY_BUFFER, transfos_.size() * sizeof(glm::mat<4, 4, glm::u16>), &transfos_.data()[0], GL_DYNAMIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, transfos_.size() * sizeof(glm::mat4), &transfos_.data()[0], GL_DYNAMIC_DRAW);
 
         glEnableVertexAttribArray(7);
-        glVertexAttribPointer(7, 4, GL_HALF_FLOAT, GL_FALSE, constexpr (4 * sizeof(glm::vec<4, glm::u16>)), (void*)0);
+        glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, (4 * sizeof(glm::vec4)), (void*)0);
         glEnableVertexAttribArray(8);
-        glVertexAttribPointer(8, 4, GL_HALF_FLOAT, GL_FALSE, constexpr (4 * sizeof(glm::vec<4, glm::u16>)), (void*)sizeof(glm::vec<4, glm::u16>));
+        glVertexAttribPointer(8, 4, GL_FLOAT, GL_FALSE, (4 * sizeof(glm::vec4)), (void*)sizeof(glm::vec4));
         glEnableVertexAttribArray(9);
-        glVertexAttribPointer(9, 4, GL_HALF_FLOAT, GL_FALSE, constexpr (4 * sizeof(glm::vec<4, glm::u16>)), (void*)constexpr (2 * sizeof(glm::vec<4, glm::u16>)));
+        glVertexAttribPointer(9, 4, GL_FLOAT, GL_FALSE, (4 * sizeof(glm::vec4)), (void*)(2 * sizeof(glm::vec4)));
         glEnableVertexAttribArray(10);
-        glVertexAttribPointer(10, 4, GL_HALF_FLOAT, GL_FALSE, constexpr (4 * sizeof(glm::vec<4, glm::u16>)), (void*)constexpr (3 * sizeof(glm::vec<4, glm::u16>)));
+        glVertexAttribPointer(10, 4, GL_FLOAT, GL_FALSE, (4 * sizeof(glm::vec4)), (void*)(3 * sizeof(glm::vec4)));
 
         glVertexAttribDivisor(7, 1);
         glVertexAttribDivisor(8, 1);
@@ -147,16 +147,16 @@ void Blocks::SetBuffers() {
             glVertexAttribPointer(6, OGL::MAX_BONE_INFLUENCE, GL_HALF_FLOAT, GL_FALSE, sizeof(Vertex3D), (void*)OGL::WEIGHTS_OFFSET);
 
             glBindBuffer(GL_ARRAY_BUFFER, mbo_[1]);
-            glBufferData(GL_ARRAY_BUFFER, transfos_.size() * sizeof(glm::mat<4, 4, glm::u16>), &transfos_.data()[0], GL_DYNAMIC_DRAW);
+            glBufferData(GL_ARRAY_BUFFER, transfos_.size() * sizeof(glm::mat4), &transfos_.data()[0], GL_DYNAMIC_DRAW);
 
             glEnableVertexAttribArray(7);
-            glVertexAttribPointer(7, 4, GL_HALF_FLOAT, GL_FALSE, constexpr (4 * sizeof(glm::vec<4, glm::u16>)), (void*)0);
+            glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, (4 * sizeof(glm::vec4)), (void*)0);
             glEnableVertexAttribArray(8);
-            glVertexAttribPointer(8, 4, GL_HALF_FLOAT, GL_FALSE, constexpr (4 * sizeof(glm::vec<4, glm::u16>)), (void*)sizeof(glm::vec<4, glm::u16>));
+            glVertexAttribPointer(8, 4, GL_FLOAT, GL_FALSE, (4 * sizeof(glm::vec4)), (void*)sizeof(glm::vec4));
             glEnableVertexAttribArray(9);
-            glVertexAttribPointer(9, 4, GL_HALF_FLOAT, GL_FALSE, constexpr (4 * sizeof(glm::vec<4, glm::u16>)), (void*)constexpr (2 * sizeof(glm::vec<4, glm::u16>)));
+            glVertexAttribPointer(9, 4, GL_FLOAT, GL_FALSE, (4 * sizeof(glm::vec4)), (void*)(2 * sizeof(glm::vec4)));
             glEnableVertexAttribArray(10);
-            glVertexAttribPointer(10, 4, GL_HALF_FLOAT, GL_FALSE, constexpr (4 * sizeof(glm::vec<4, glm::u16>)), (void*)constexpr (3 * sizeof(glm::vec<4, glm::u16>)));
+            glVertexAttribPointer(10, 4, GL_FLOAT, GL_FALSE, (4 * sizeof(glm::vec4)), (void*)(3 * sizeof(glm::vec4)));
 
             glVertexAttribDivisor(7, 1);
             glVertexAttribDivisor(8, 1);

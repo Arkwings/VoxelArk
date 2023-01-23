@@ -69,7 +69,7 @@ void Chunk::AddNoiseTerain(GLfloat* noisePoints) {
 void Chunk::SetupTransfos(const int& xpos, const int& zpos) {
     // TIME_CHECK_START();
 
-    std::vector<std::vector<glm::mat<4, 4, glm::u16>>> transfos(OPT::MAX_BLOCKS);
+    std::vector<std::vector<glm::mat4>> transfos(OPT::MAX_BLOCKS);
     std::vector<std::vector<glm::vec<3, glm::u16>>> neighbours(OPT::MAX_BLOCKS);
     int y, z, x;
     int nei;
@@ -93,11 +93,11 @@ void Chunk::SetupTransfos(const int& xpos, const int& zpos) {
 
                     if (nei != 63) {
                         transfos[blocks_pos_[y][z][x]].push_back(std::move(
-                            glm::mat<4, 4, glm::u16>(
-                                static_cast<glm::u16>(glm::detail::toFloat16(1.0f)), 0, 0, 0,
-                                0, static_cast<glm::u16>(glm::detail::toFloat16(1.0f)), 0, 0,
-                                0, 0, static_cast<glm::u16>(glm::detail::toFloat16(1.0f)), 0,
-                                glm::detail::toFloat16(x + xdiff), glm::detail::toFloat16(y + ydiff), glm::detail::toFloat16(z + zdiff), static_cast<glm::u16>(glm::detail::toFloat16(1.0f)))
+                            glm::mat4(
+                                1.0f, 0.0f, 0.0f, 0.0f,
+                                0.0f, 1.0f, 0.0f, 0.0f,
+                                0.0f, 0.0f, 1.0f, 0.0f,
+                                x + xdiff, y + ydiff, z + zdiff, 1.0f)
                         ));
                         neighbours[blocks_pos_[y][z][x]].push_back(std::move(
                             glm::vec<3, glm::u16>(glm::detail::toFloat16(static_cast<float>(nei)), 0, 0)
