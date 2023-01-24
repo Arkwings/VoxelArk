@@ -23,11 +23,11 @@ NoiseMap::NoiseMap() {
 
     std::vector<std::string> res;
     for (unsigned char i = 1; i < OPT::MAX_BLOCKS; ++i) {
-        res.push_back(G_TexJson->Get("/Blocks/" + block_id_name_correspondance[i] + "/top_textures"));   //+ "," + G_TexJson->Get("/Blocks/" + block_id_name_correspondance[i] + "/top_normals"));
-        res.push_back(G_TexJson->Get("/Blocks/" + block_id_name_correspondance[i] + "/side_textures"));   //+ "," + G_TexJson->Get("/Blocks/" + block_id_name_correspondance[i] + "/side_normals"));
-        res.push_back(G_TexJson->Get("/Blocks/" + block_id_name_correspondance[i] + "/bottom_texture"));   //+ "," + G_TexJson->Get("/Blocks/" + block_id_name_correspondance[i] + "/bottom_normal"));
-        res.push_back(G_TexJson->Get("/Blocks/" + block_id_name_correspondance[i] + "/top_over_textures"));   //+ "," + G_TexJson->Get("/Blocks/" + block_id_name_correspondance[i] + "/top_over_normals"));
-        res.push_back(G_TexJson->Get("/Blocks/" + block_id_name_correspondance[i] + "/side_over_textures"));   //+ "," + G_TexJson->Get("/Blocks/" + block_id_name_correspondance[i] + "/side_over_normals"));
+        res.push_back(G_TexJson->Get("/Blocks/" + block_id_name_correspondance[i] + "/top_textures") + "," + G_TexJson->Get("/Blocks/" + block_id_name_correspondance[i] + "/top_normals"));
+        res.push_back(G_TexJson->Get("/Blocks/" + block_id_name_correspondance[i] + "/side_textures") + "," + G_TexJson->Get("/Blocks/" + block_id_name_correspondance[i] + "/side_normals"));
+        res.push_back(G_TexJson->Get("/Blocks/" + block_id_name_correspondance[i] + "/bottom_texture") + "," + G_TexJson->Get("/Blocks/" + block_id_name_correspondance[i] + "/bottom_normal"));
+        res.push_back(G_TexJson->Get("/Blocks/" + block_id_name_correspondance[i] + "/top_over_textures") + "," + G_TexJson->Get("/Blocks/" + block_id_name_correspondance[i] + "/top_over_normals"));
+        res.push_back(G_TexJson->Get("/Blocks/" + block_id_name_correspondance[i] + "/side_over_textures") + "," + G_TexJson->Get("/Blocks/" + block_id_name_correspondance[i] + "/side_over_normals"));
 
         blocks_[i] = new Block(res);
         res.clear();
