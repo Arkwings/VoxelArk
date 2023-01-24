@@ -13,9 +13,12 @@ in VertexData
 out FragmentData
 {
     vec3 fs_tex_coord;
-    flat vec4 fs_pos;
-    flat vec4 fs_normals;
+    vec4 fs_pos;
+    flat vec3 fs_normals;
+    flat vec3 fs_tangents;
+    flat vec3 fs_bitangents;
     flat vec3 fs_FacesOtherOther;
+    flat mat3 fs_TBN;
 }   outData;
 
 uniform mat4 P;
@@ -34,13 +37,22 @@ const vec4 vertices[8] = vec4[8](
     vec4(0.5, 0.5, 0.5, 1.0)
     );
 
-const vec4 normals[6] = vec4[6](
-    vec4(0.0, 1.0, 0.0, 1.0),   //top
-    vec4(0.0, -1.0, 0.0, 1.0),  //bottom
-    vec4(1.0, 0.0, 0.0, 1.0),   //right
-    vec4(-1.0, 0.0, 0.0, 1.0),  //left
-    vec4(0.0, 0.0, 1.0, 1.0),   //back
-    vec4(0.0, 0.0, -1.0, 1.0)   //front
+const vec3 normals[6] = vec3[6](
+    vec3(0.0, 1.0, 0.0),   //top
+    vec3(0.0, -1.0, 0.0),  //bottom
+    vec3(1.0, 0.0, 0.0),   //right
+    vec3(-1.0, 0.0, 0.0),  //left
+    vec3(0.0, 0.0, 1.0),   //back
+    vec3(0.0, 0.0, -1.0)   //front
+    );
+
+const vec3 tangents[6] = vec3[6](
+    vec3(1.0, 0.0, 0.0),   //top
+    vec3(-1.0, 0.0, 0.0),  //bottom
+    vec3(0.0, 0.0, 1.0),   //right
+    vec3(0.0, 0.0, -1.0),  //left
+    vec3(-1.0, 0.0, 0.0),   //back
+    vec3(1.0, 0.0, 0.0)   //front
     );
 
 const vec2 tex_coords[4] = vec2[4](
@@ -63,43 +75,33 @@ const int indices[24] = int [24]
 
 void main()
 {
-    // gl_Position = gl_in[0].gl_Position; 
-    // outData.fs_tex_coord = inData[0].gs_tex_coord;
-    // outData.fs_pos = inData[0].gs_pos;
-    // outData.fs_normals = inData[0].gs_normals;
-    // outData.fs_FacesOtherOther = inData[0].gs_FacesOtherOther;
-    // EmitVertex();
-    
-    // gl_Position = gl_in[1].gl_Position; 
-    // outData.fs_tex_coord = inData[1].gs_tex_coord;
-    // outData.fs_pos = inData[1].gs_pos;
-    // outData.fs_normals = inData[1].gs_normals;
-    // outData.fs_FacesOtherOther = inData[1].gs_FacesOtherOther;
-    // EmitVertex();
-    
-    // gl_Position = gl_in[2].gl_Position; 
-    // outData.fs_tex_coord = inData[2].gs_tex_coord;
-    // outData.fs_pos = inData[2].gs_pos;
-    // outData.fs_normals = inData[2].gs_normals;
-    // outData.fs_FacesOtherOther = inData[2].gs_FacesOtherOther;
-    // EmitVertex();
-
     vec4 temp_vertices[8];  
-    vec4 temp_normals[6];  
+    vec3 temp_normals[6];  
+    vec3 temp_tangents[6];  
+
     mat4 PVM = P * V * inData[0].gs_M;
     mat4 TrasnInvM = transpose(inverse(inData[0].gs_M));
 
     for (int i=0;i<8; i++) 
         temp_vertices[i]= PVM * (gl_in[0].gl_Position + vertices[i]);
     for (int i=0;i<6; i++) 
-        temp_normals[i] = vec4(TrasnInvM * normals[i]); 
+        temp_normals[i] = vec3(vec4(TrasnInvM * vec4(normals[i], 1.0)).xyz); 
+        for (int i=0;i<6; i++) 
+        temp_tangents[i] = vec3(vec4(TrasnInvM * vec4(normals[i], 1.0)).xyz); 
 
     for(int j = 0; j < 6; j++) {
         for (int i = 0; i < 4; i++) {
             gl_Position = temp_vertices[indices[4*j + i]];
             outData.fs_tex_coord = vec3(tex_coords[i], inData[0].gs_layer);
+            //outData.fs_pos = vertices[indices[4*j + i]];
             outData.fs_pos = inData[0].gs_M * vertices[indices[4*j + i]];
             outData.fs_normals = temp_normals[j];
+            outData.fs_tangents = temp_tangents[j];
+            outData.fs_bitangents = cross(outData.fs_normals, outData.fs_tangents);
+            outData.fs_TBN = transpose(mat3( 
+                                mat3(inData[0].gs_M) * outData.fs_tangents,
+                                mat3(inData[0].gs_M) * outData.fs_bitangents,
+                                mat3(inData[0].gs_M) * outData.fs_normals));    //trnaspose also inverse since it's an orthogonal matrix 
             outData.fs_FacesOtherOther = inData[0].gs_FacesOtherOther;            
             EmitVertex();
         }   
