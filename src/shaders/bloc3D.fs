@@ -1,9 +1,12 @@
 #version 450
 
-in vec3 fs_tex_coord;
-in vec4 fs_pos;
-in vec4 fs_normals;
-flat in vec3 fs_FacesOtherOther;
+in FragmentData
+{
+    vec3 fs_tex_coord;
+    flat vec4 fs_pos;
+    flat vec4 fs_normals;
+    flat vec3 fs_FacesOtherOther;
+} inData;
 
 //texture
 uniform sampler2DArray top_samplers;
@@ -37,7 +40,7 @@ uniform float rotation;
 
 uniform float ambientStrength = 0.2f;
 uniform float diffStrength = 0.7f;
-uniform float shininess = 16.0f;
+uniform float shininess = 32.0f;
 uniform float specularStrength = 16.0f;
 
 //selection
@@ -91,14 +94,14 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0) {
 vec3 lightsComputation(vec3 normals, vec3 lightDir, vec3 lightCol) {
     vec3 lighting;
 
-    vec3 V = normalize(eyePos - fs_pos.xyz);
+    vec3 V = normalize(eyePos - inData.fs_pos.xyz);
     vec3 F0 = vec3(0.04); 
     F0 = mix(F0, albedo, metallic);
 
     //repeat below for mult lights
 
     // calculate per-light radiance
-    // vec3 L = normalize(lightPos - fs_pos.xyz);
+    // vec3 L = normalize(lightPos - inData.fs_pos.xyz);
     vec3 L = lightDir;
     vec3 H = normalize(V + L);    
     float distance    = 6.0f;
@@ -130,9 +133,9 @@ vec3 simplifiedLight(vec3 normals, vec3 lightDir, vec3 lightCol) {
     float diff = max(dot(normals, lightDir), 0.0);
     vec3 diffuse = diff * lightCol * diffStrength;
 
-    vec3 eyeDir    = normalize(eyePos - fs_pos.xyz);
+    vec3 eyeDir    = normalize(eyePos - inData.fs_pos.xyz);
     vec3 halfwayDir = normalize(lightDir + eyeDir);
-    // vec3 reflectDir = reflect(-lightDir, normals);
+    //vec3 reflectDir = reflect(-lightDir, normals);
 
     //blinn-phong
     float spec = pow(max(dot(normals, halfwayDir), 0.0), shininess);
@@ -143,39 +146,38 @@ vec3 simplifiedLight(vec3 normals, vec3 lightDir, vec3 lightCol) {
     // vec3 specular = specularStrength * spec * lightColor;  
 
     return diffuse + specular;
-    return specular;
 }
 
 vec4 texturing(vec3 normals, float faces) {     
 
     if(faces >= 32) {
-        if(normals.z < -0.1) discard;
+        if(normals.z < -0.5) discard;
         faces = faces - 32;
     }
     if(faces >= 16) {
-        if(normals.z > 0.1) discard;
+        if(normals.z > 0.5) discard;
         faces = faces - 16;
     }
     if(faces >= 8) {
-        if(normals.x < -0.1) discard;
+        if(normals.x < -0.5) discard;
         faces = faces - 8;
     }
     if(faces >= 4) {
-        if(normals.x > 0.1) discard;
+        if(normals.x > 0.5) discard;
         faces = faces - 4;
     }
     if(faces >= 2) {
-        if(normals.y < -0.1) discard;
+        if(normals.y < -0.5) discard;
         faces = faces - 2;
     }
     if(faces >= 1) {
-        if(normals.y > 0.1) discard;
+        if(normals.y > 0.5) discard;
     }
 
-    vec4 color = vec4(fs_tex_coord.z, 0.0, 0.0, 1.0);
-    float top_layer = fs_tex_coord.z * top_layers;
-    float bottom_layer = fs_tex_coord.z * bottom_layers;
-    float side_layer = fs_tex_coord.z * side_layers;    
+    vec4 color = vec4(inData.fs_tex_coord.z, 0.0, 0.0, 1.0);
+    float top_layer = inData.fs_tex_coord.z * top_layers;
+    float bottom_layer = inData.fs_tex_coord.z * bottom_layers;
+    float side_layer = inData.fs_tex_coord.z * side_layers;    
     top_layer = (top_layer * top_layer * top_layer) / (top_layers * top_layers) - 0.5;
     bottom_layer = (bottom_layer * bottom_layer * bottom_layer) / (bottom_layers * bottom_layers) - 0.5;
     side_layer = (side_layer * side_layer * side_layer) / (side_layers * side_layers) - 0.5;
@@ -183,12 +185,12 @@ vec4 texturing(vec3 normals, float faces) {
     vec3 selected = vec3(16.0, 131.0, 22.0);
 
     //for selection
-    vec2 tex_coord = fs_tex_coord.xy;
+    vec2 tex_coord = inData.fs_tex_coord.xy;
     float displacement = rotation * 15;
     float blockScale = 0.501f;
     if(isSelectedBlock == 1
-    && fs_pos.x-blockScale <= selectedBlock.x && fs_pos.y-blockScale <= selectedBlock.y && fs_pos.z-blockScale <= selectedBlock.z
-    && fs_pos.x+blockScale >= selectedBlock.x && fs_pos.y+blockScale >= selectedBlock.y && fs_pos.z+blockScale >= selectedBlock.z) {
+    && inData.fs_pos.x-blockScale <= selectedBlock.x && inData.fs_pos.y-blockScale <= selectedBlock.y && inData.fs_pos.z-blockScale <= selectedBlock.z
+    && inData.fs_pos.x+blockScale >= selectedBlock.x && inData.fs_pos.y+blockScale >= selectedBlock.y && inData.fs_pos.z+blockScale >= selectedBlock.z) {
         float tex_scale = 5.0f;
         float tex_speed = 2.5f;
         float tex_strength = 75.0f;
@@ -205,12 +207,12 @@ vec4 texturing(vec3 normals, float faces) {
     else
         color = texture(side_samplers, vec3(tex_coord, max(0, min(side_layers - 1, floor(side_layer + 0.5)))));
 
-    if(color.a < 0.1f || selected == fs_pos.xyz) discard;
+    if(color.a < 0.1f || selected == inData.fs_pos.xyz) discard;
 
     //for selection
     if(isSelectedBlock == 1
-    && fs_pos.x-blockScale <= selectedBlock.x && fs_pos.y-blockScale <= selectedBlock.y && fs_pos.z-blockScale <= selectedBlock.z
-    && fs_pos.x+blockScale >= selectedBlock.x && fs_pos.y+blockScale >= selectedBlock.y && fs_pos.z+blockScale >= selectedBlock.z) {
+    && inData.fs_pos.x-blockScale <= selectedBlock.x && inData.fs_pos.y-blockScale <= selectedBlock.y && inData.fs_pos.z-blockScale <= selectedBlock.z
+    && inData.fs_pos.x+blockScale >= selectedBlock.x && inData.fs_pos.y+blockScale >= selectedBlock.y && inData.fs_pos.z+blockScale >= selectedBlock.z) {
         float color_scale = 2.5f;
         float color_speed = 2.5f;
         float color_strength = 50.0f;
@@ -224,7 +226,7 @@ vec4 texturing(vec3 normals, float faces) {
 	    color.b += cos(tex_coord.x*color_scale+displacement*color_speed)/color_strength;
 	    color.b += cos(tex_coord.x*color_scale+displacement*color_speed)/color_strength;
 
-        float man_distance = (abs(fs_pos.x - selectedBlock.x) + abs(fs_pos.y - selectedBlock.y) + abs(fs_pos.z - selectedBlock.z))/3; 
+        float man_distance = (abs(inData.fs_pos.x - selectedBlock.x) + abs(inData.fs_pos.y - selectedBlock.y) + abs(inData.fs_pos.z - selectedBlock.z))/3; 
         float mid_dist = man_distance - 0.5f;
         // float mid_dist = abs(distance(fs_pos, selectedBlock)) - 0.5f;
         float dist_factor = 1.0f;
@@ -238,7 +240,7 @@ vec4 texturing(vec3 normals, float faces) {
 
 void main()
 {
-    vec3 normals = normalize(fs_normals.xyz);
+    vec3 normals = normalize(inData.fs_normals.xyz);
     
     vec3 lighting = vec3(ambientStrength);
     //simple
@@ -256,11 +258,13 @@ void main()
         lighting += (1-(rota - (PI - PI_16)) / (PI + PI_16 - (PI - PI_16))) * simplifiedLight(normals, normalize(moonDir), moonColor);
         lighting += ((rota - (PI - PI_16)) / (PI + PI_16 - (PI - PI_16))) * simplifiedLight(normals, normalize(sunDir), sunColor);
     }
-    vec4 color = texturing(normals, fs_FacesOtherOther.x);
+    vec4 color = texturing(normals, inData.fs_FacesOtherOther.x);
 
     vec3 colorlight = lighting * color.rgb ;
     // colorlight = colorlight / (colorlight + vec3(1.0));
     // colorlight = pow(colorlight, vec3(1.0/2.2));  
 
     gl_Color = vec4(colorlight, color.a);
+    //gl_Color = vec4(normals.x, normals.y, normals.z, 1.0);
+    //gl_Color = texture(top_samplers, vec3(inData.fs_tex_coord.xy, 0));
 }

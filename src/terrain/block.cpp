@@ -34,3 +34,13 @@ void Block::Draw(const unsigned int& index_size, const unsigned int& transfo_siz
 
     glDrawElementsInstanced(GL_TRIANGLES, index_size, GL_UNSIGNED_INT, 0, transfo_size);
 }
+
+void Block::DrawPoints(const unsigned int& transfo_size) {
+    top_tex_->Bind(0, glGetUniformLocation((*G_ShaderHandler)[SHA::BLOC3D]->GetID(), "top_layers"));
+    side_tex_->Bind(1, glGetUniformLocation((*G_ShaderHandler)[SHA::BLOC3D]->GetID(), "side_layers"));
+    bottom_tex_->Bind(2, glGetUniformLocation((*G_ShaderHandler)[SHA::BLOC3D]->GetID(), "bottom_layers"));
+    top_over_tex_->Bind(3, glGetUniformLocation((*G_ShaderHandler)[SHA::BLOC3D]->GetID(), "top_over_layers"));
+    side_over_tex_->Bind(4, glGetUniformLocation((*G_ShaderHandler)[SHA::BLOC3D]->GetID(), "side_over_layers"));
+
+    glDrawArraysInstanced(GL_POINTS, 0, 1, transfo_size);
+}

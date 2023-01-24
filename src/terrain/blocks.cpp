@@ -9,9 +9,9 @@
 #include "terrain/blocks.hpp"
 
 Blocks::Blocks()
-    : vertices_((*G_ObjectHandler3D)[OBJ3D::CUBE]->GetData()->GetData())
-    , indexes_((*G_ObjectHandler3D)[OBJ3D::CUBE]->GetData()->GetIndexes())
-    , vao_{ 0U, 0U }
+    // : vertices_((*G_ObjectHandler3D)[OBJ3D::CUBE]->GetData()->GetData())
+    // , indexes_((*G_ObjectHandler3D)[OBJ3D::CUBE]->GetData()->GetIndexes())
+    : vao_{ 0U, 0U }
     , vbo_{ 0U, 0U }
     , ebo_{ 0U, 0U }
     , mbo_{ 0U, 0U }
@@ -59,11 +59,13 @@ void Blocks::SetBuffers() {
 
         glBindVertexArray(vao_[0]);
 
+        // glBindBuffer(GL_ARRAY_BUFFER, vbo_[0]);
+        // glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex3D) * vertices_.size(), &vertices_.data()[0], GL_STATIC_DRAW);
         glBindBuffer(GL_ARRAY_BUFFER, vbo_[0]);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex3D) * vertices_.size(), &vertices_.data()[0], GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(point_), &point_[0], GL_STATIC_DRAW);
 
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_[0]);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexes_.size() * sizeof(unsigned int), &indexes_[0], GL_STATIC_DRAW);
+        // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_[0]);
+        // glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexes_.size() * sizeof(unsigned int), &indexes_[0], GL_STATIC_DRAW);
 
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 4, GL_HALF_FLOAT, GL_FALSE, sizeof(Vertex3D), (void*)OGL::POS_OFFSET);
@@ -119,11 +121,13 @@ void Blocks::SetBuffers() {
 
             glBindVertexArray(vao_[1]);
 
+            // glBindBuffer(GL_ARRAY_BUFFER, vbo_[1]);
+            // glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex3D) * vertices_.size(), &vertices_.data()[0], GL_STATIC_DRAW);
             glBindBuffer(GL_ARRAY_BUFFER, vbo_[1]);
-            glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex3D) * vertices_.size(), &vertices_.data()[0], GL_STATIC_DRAW);
+            glBufferData(GL_ARRAY_BUFFER, sizeof(point_), &point_[0], GL_STATIC_DRAW);
 
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_[1]);
-            glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexes_.size() * sizeof(unsigned int), &indexes_[0], GL_STATIC_DRAW);
+            // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_[1]);
+            // glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexes_.size() * sizeof(unsigned int), &indexes_[0], GL_STATIC_DRAW);
 
             glEnableVertexAttribArray(0);
             glVertexAttribPointer(0, 4, GL_HALF_FLOAT, GL_FALSE, sizeof(Vertex3D), (void*)OGL::POS_OFFSET);
@@ -178,7 +182,9 @@ void Blocks::SetBuffers() {
 void Blocks::Draw(const unsigned int& ID, const unsigned int& active_buffer) {
     if (vao_[active_buffer]) {
         glBindVertexArray(vao_[active_buffer]);
-        G_NoiseMap->GetBlock(ID)->Draw(vao_[active_buffer] != 0U ? indexes_.size() : 0, vao_[active_buffer] != 0U ? transfos_.size() : 0);
+        // G_NoiseMap->GetBlock(ID)->Draw(vao_[active_buffer] != 0U ? indexes_.size() : 0, vao_[active_buffer] != 0U ? transfos_.size() : 0);
+        G_NoiseMap->GetBlock(ID)->DrawPoints(vao_[active_buffer] != 0U ? transfos_.size() : 0);
+
         glBindVertexArray(0);
     }
 }

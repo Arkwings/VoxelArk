@@ -27,8 +27,9 @@ class Blocks {
     private:
     std::vector <glm::mat4> transfos_;
     std::vector<glm::vec<3, glm::u16>> neighbours_;      // x: 0->none, 1 -> top, 2-> bottom, 4-> left, 8->right, 16->front, 32->back, binary and comparison
-    const std::vector<Vertex3D>& vertices_;
-    const std::vector<unsigned int>& indexes_;
+    // const std::vector<Vertex3D>& vertices_;
+    // const std::vector<unsigned int>& indexes_;
+    const glm::vec3& point_ = glm::vec3(0, 0, 0);
     unsigned int vao_[2];
     unsigned int vbo_[2];
     unsigned int ebo_[2];

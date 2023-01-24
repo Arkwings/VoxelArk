@@ -540,6 +540,7 @@ class Block {
     Block& operator=(const Block&) = delete;
 
     void Draw(const unsigned int& index_size, const unsigned int& transfo_size);
+    void DrawPoints(const unsigned int& transfo_size);
 
     private:
     DataComponent* data_ = nullptr;

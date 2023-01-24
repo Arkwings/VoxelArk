@@ -14,10 +14,12 @@ layout (location = 11) in vec3 FacesOtherOther;
 uniform mat4 P;
 uniform mat4 V;
 
-out vec3 fs_tex_coord;
-out vec4 fs_pos;
-out vec4 fs_normals;
-flat out vec3 fs_FacesOtherOther;
+out VertexData
+{
+    flat mat4 gs_M;
+    flat vec3 gs_FacesOtherOther;
+    float gs_layer;
+} outData;
 
 float PHI = 1.61803398874989484820459;  // Φ = Golden Ratio   
 float gold_noise(in vec3 xyz){
@@ -28,11 +30,9 @@ void main()
 {
     mat4 M = Model;
 
-    gl_Position = P * V * M * pos_coord;
+    gl_Position = pos_coord;
 
-    float layer = gold_noise(vec3(M[3][0], M[3][1], M[3][2]));
-    fs_tex_coord = vec3(tex_coord, layer);
-    fs_pos = M * pos_coord;
-    fs_normals = transpose(inverse(M)) * normals;
-    fs_FacesOtherOther = FacesOtherOther;
+    outData.gs_layer = gold_noise(vec3(M[3][0], M[3][1], M[3][2]));
+    outData.gs_FacesOtherOther = FacesOtherOther;
+    outData.gs_M = M;
 }
