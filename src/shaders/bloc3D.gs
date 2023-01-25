@@ -85,9 +85,9 @@ void main()
     for (int i=0;i<8; i++) 
         temp_vertices[i]= PVM * (gl_in[0].gl_Position + vertices[i]);
     for (int i=0;i<6; i++) 
-        temp_normals[i] = vec3(vec4(TrasnInvM * vec4(normals[i], 1.0)).xyz); 
-        for (int i=0;i<6; i++) 
-        temp_tangents[i] = vec3(vec4(TrasnInvM * vec4(normals[i], 1.0)).xyz); 
+         temp_normals[i] = vec3(vec4(TrasnInvM * vec4(normals[i], 1.0)).xyz); 
+    for (int i=0;i<6; i++) 
+    temp_tangents[i] = tangents[i];
 
     for(int j = 0; j < 6; j++) {
         for (int i = 0; i < 4; i++) {
@@ -97,11 +97,11 @@ void main()
             outData.fs_pos = inData[0].gs_M * vertices[indices[4*j + i]];
             outData.fs_normals = temp_normals[j];
             outData.fs_tangents = temp_tangents[j];
-            outData.fs_bitangents = cross(outData.fs_normals, outData.fs_tangents);
+            outData.fs_bitangents = normalize(cross(outData.fs_normals, outData.fs_tangents));    
             outData.fs_TBN = transpose(mat3( 
                                 mat3(inData[0].gs_M) * outData.fs_tangents,
                                 mat3(inData[0].gs_M) * outData.fs_bitangents,
-                                mat3(inData[0].gs_M) * outData.fs_normals));    //trnaspose also inverse since it's an orthogonal matrix 
+                                mat3(inData[0].gs_M) * outData.fs_normals));    //trnaspose also inverse since it's an orthogonal matrix         
             outData.fs_FacesOtherOther = inData[0].gs_FacesOtherOther;            
             EmitVertex();
         }   

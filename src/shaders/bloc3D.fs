@@ -45,7 +45,7 @@ uniform float ambientStrength = 0.15f; //[0-1]
 uniform float diffStrength = 1.0f;
 uniform float shininess = 16.0f;
 uniform float specularStrength = 16.0f;
-uniform float normalMapStrength = 0.7f; //[0-1]
+uniform float normalMapStrength = 0.9f; //[0-1]
 
 //selection
 uniform vec3 selectedBlock;
@@ -57,12 +57,11 @@ const float PI_X_2 = 6.28318530717;
 const float PI = 3.14159265359;
 const float PI_16 = 0.19634954084;
 
-//blinn-phong
+//blinn-phong + normal mapping
 vec3 simplifiedLight(vec3 normals, vec3 lightDir, vec3 lightCol, float top_layer, float bottom_layer, float side_layer) {
 
-    vec3 eyeDir    = normalize(eyePos - inData.fs_pos.xyz);
     vec3 lightDir_tanspace = inData.fs_TBN * lightDir;
-    vec3 eyeDir_tanspace = inData.fs_TBN * eyeDir;
+    vec3 eyeDir_tanspace = inData.fs_TBN * normalize(eyePos - inData.fs_pos.xyz);
 
     vec2 tex_coord = inData.fs_tex_coord.xy;
     vec3 normal_tanspace;
@@ -72,20 +71,35 @@ vec3 simplifiedLight(vec3 normals, vec3 lightDir, vec3 lightCol, float top_layer
         normal_tanspace = normalize(texture(bottom_samplers, vec3(tex_coord,  bottom_layers/2 + bottom_layer)).rgb*2.0 - 1.0);
     else
         normal_tanspace = normalize(texture(side_samplers, vec3(tex_coord,  side_layers/2 +side_layer)).rgb*2.0 - 1.0);
-    normal_tanspace = normal_tanspace * normalMapStrength;
+    normal_tanspace = normalize(normal_tanspace) * normalMapStrength;
 
     float diff = max(dot(normal_tanspace, lightDir_tanspace), 0.0);
     vec3 diffuse = diff * lightCol * diffStrength;
 
     //blinn-phong
     float spec = 0.0;
-    vec3 halfwayDir = normalize(eyeDir + lightDir);
     vec3 halfwayDir_tanspace = normalize(eyeDir_tanspace + lightDir_tanspace);
-    if(diff > 0.0) spec = pow(max(dot(normals + normal_tanspace/8.0f, halfwayDir), 0.0), shininess);
+    if(diff > 0.0) spec = pow(max(dot(normal_tanspace, halfwayDir_tanspace), 0.0), shininess);
     vec3 specular = lightCol * spec;
 
     return specular + diffuse;
 }
+
+// vec3 simplifiedLight(vec3 normals, vec3 lightDir, vec3 lightCol, float top_layer, float bottom_layer, float side_layer) {
+
+//     vec3 eyeDir    = normalize(eyePos - inData.fs_pos.xyz);
+
+//     float diff = max(dot(normals, lightDir), 0.0);
+//     vec3 diffuse = diff * lightCol * diffStrength;
+
+//     //blinn-phong
+//     float spec = 0.0;
+//     vec3 halfwayDir = normalize(eyeDir + lightDir);
+//     if(diff > 0.0) spec = pow(max(dot(normals, halfwayDir), 0.0), shininess);
+//     vec3 specular = lightCol * spec;
+
+//     return specular + diffuse;
+// }
 
 vec4 texturing(vec3 normals, float faces, float top_layer, float bottom_layer, float side_layer) {     
 
